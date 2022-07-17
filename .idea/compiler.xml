@@ -14,13 +14,14 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="restful" target="1.5" />
+      <module name="wrapper" target="1.5" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="restful" options="-parameters" />
       <module name="restroborally" options="-parameters" />
-      <module name="roborally" options="" />
+      <module name="roborally" options="--add-modules java.base" />
     </option>
   </component>
 </project>
