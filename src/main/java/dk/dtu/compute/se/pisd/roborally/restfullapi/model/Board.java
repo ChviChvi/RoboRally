@@ -76,7 +76,7 @@ public class Board {
     public void setWidth(int width) {
         this.width = width;
     }
-
+//hoi
     public int getHeight() {
         return height;
     }
