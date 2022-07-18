@@ -1,18 +1,7 @@
 {
   "width": 8,
   "height": 8,
-  "spaces": [
-    {
-      "walls": "rovi",
-      "x": 0,
-      "y": 0
-    },
-    {
-      "walls": "mark",
-      "x": 2,
-      "y": 2
-    }
-  ],
+  "spaces": [],
   "players": [
     {
       "name": "Player 1",

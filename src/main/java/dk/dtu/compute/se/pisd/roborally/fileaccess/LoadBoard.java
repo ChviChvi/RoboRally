@@ -33,8 +33,19 @@ import dk.dtu.compute.se.pisd.roborally.model.Board;
 import dk.dtu.compute.se.pisd.roborally.model.Player;
 import dk.dtu.compute.se.pisd.roborally.model.Space;
 import dk.dtu.compute.se.pisd.roborally.restfullapi.PlayerService;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 import java.io.*;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * ...
@@ -53,12 +64,32 @@ public class LoadBoard {
 
 
     public static Board loadBoard(String boardname) {
+
+        JSONParser parser = new JSONParser();
+        try{
+            Object obj = parser.parse(new FileReader("src/main/resources/boards/SavedGame1.json"));
+
+            JSONObject jsonObject = (JSONObject) obj;
+
+            JSONArray companyList = (JSONArray) jsonObject.get("players");
+
+            Iterator<JSONObject> iterator = companyList.iterator();
+            int player = 0;
+            while (iterator.hasNext()) {
+
+                System.out.println(iterator.next());
+        }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         if (boardname == null) {
             boardname = DEFAULTBOARD;
         }
 
         ClassLoader classLoader = LoadBoard.class.getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(BOARDSFOLDER + "/" + boardname + "." + JSON_EXT);
+        InputStream inputStream = classLoader.getResourceAsStream("src/main/resources/" + BOARDSFOLDER + "/" + boardname + "/SavedGame1/" + JSON_EXT);
+        System.out.println(inputStream);
         if (inputStream == null) {
             // TODO these constants should be defined somewhere
             return new Board(8,8);
@@ -70,10 +101,10 @@ public class LoadBoard {
         Gson gson = simpleBuilder.create();
 
         Board result;
-        //FileReader fileReader = null;
+        FileReader fileReader = null;
         JsonReader reader = null;
         try {
-            // fileReader = new FileReader(filename);
+            fileReader = new FileReader("src/main/resources/boards/SavedGame1.json");
             reader = gson.newJsonReader(new InputStreamReader(inputStream));
             BoardTemplate template = gson.fromJson(reader, BoardTemplate.class);
 
@@ -103,8 +134,22 @@ public class LoadBoard {
         return null;
     }
 
+    public static final String POST_API_URL = "http://localhost:8080/upload";
+    public static final String GET_API_URL = "http://localhost:8080/files";
+
+    public static void httpPOST() throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(GET_API_URL))
+                .build();
+        HttpResponse<String> response = client.send(request,HttpResponse.BodyHandlers.ofString());
+
+        System.out.println(response.body());
+    }
+
     //public static void saveBoard(Board board, String name) {
-    public static void saveBoard(Board board, String name) {
+    public static void saveBoard(Board board, String name) throws IOException, InterruptedException {
         BoardTemplate template = new BoardTemplate();
         template.width = board.width;
         template.height = board.height;
@@ -170,7 +215,7 @@ public class LoadBoard {
             }
         }
 
-
+        httpPOST();
 
 
 

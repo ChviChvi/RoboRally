@@ -9,6 +9,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +27,7 @@ public class AppController {
     }
 
 
-    public void newGame() {
+    public void newGame() throws IOException, InterruptedException {
         ChoiceDialog<Integer> dialog = new ChoiceDialog<>(PLAYER_NUMBER_OPTIONS.get(0), PLAYER_NUMBER_OPTIONS);
         dialog.setTitle("Player number");
         dialog.setHeaderText("Select number of players");
@@ -60,7 +61,7 @@ public class AppController {
         }
     }
 
-    public void saveGame() {
+    public void saveGame() throws IOException, InterruptedException {
         // XXX needs to be implemented eventually
         LoadBoard.saveBoard(gameController.board,"SavedGame");
     }
@@ -82,7 +83,7 @@ public class AppController {
      *
      * @return true if the current game was stopped, false otherwise
      */
-    public boolean stopGame() {
+    public boolean stopGame() throws IOException, InterruptedException {
         if (gameController != null) {
 
             // here we save the game (without asking the user).
@@ -95,7 +96,7 @@ public class AppController {
         return false;
     }
 
-    public void exit() {
+    public void exit() throws IOException, InterruptedException {
 
         if (gameController != null) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);

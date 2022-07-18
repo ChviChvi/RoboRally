@@ -21,7 +21,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="restful" options="-parameters" />
       <module name="restroborally" options="-parameters" />
-      <module name="roborally" options="--add-modules java.base" />
+      <module name="roborally" options="" />
     </option>
   </component>
 </project>
