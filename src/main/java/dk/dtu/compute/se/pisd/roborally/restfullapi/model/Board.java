@@ -26,7 +26,7 @@ public class Board {
     private Long id;
     private int width;
     private int height;
-
+//..
     //@Embedded
     //@Transient
     @OneToMany
