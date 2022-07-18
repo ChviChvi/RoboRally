@@ -9,7 +9,7 @@ import javax.persistence.*;
 //@Data
 //@Embeddable
 //@AllArgsConstructor
-@Entity
+//@Entity
 //@Table(name="Spaces")
 public class Spaces {
 

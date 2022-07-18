@@ -9,56 +9,25 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "Board")
+@Table
 public class Board {
 
     @Id
-//    @SequenceGenerator(
-//            name = "player_sequence",
-//            sequenceName = "player_sequence",
-//            allocationSize = 1
-//    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE
-            //generator = "player_sequence"
-            //strategy = GenerationType.AUTO
-    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
-    private int width;
-    private int height;
-//..
-    //@Embedded
-    //@Transient
-    @OneToMany
-    private List<Spaces> spaces;
-    @OneToMany
-    private List<Players> players;
+    private String gamestate;
 
-    //private List<Spaces> spaces;
-    //@Embedded
-    //@ElementCollection
-
-
-    public Board(Long id, int width, int height, List<Players> players, List<Spaces> spaces) {
+    public Board(Long id, String gamestate) {
         this.id = id;
-        this.width = width;
-        this.height = height;
-        this.players = players;
-        this.spaces = spaces;
+        this.gamestate = gamestate;
+    }
+
+    public Board(String gamestate) {
+        this.gamestate = gamestate;
     }
 
     public Board() {
-    }
 
-    @Override
-    public String toString() {
-        return "Player{" +
-                "id=" + id +
-                ", width=" + width +
-                ", height=" + height +
-                ", players=" + players +
-                ", spaces=" + spaces +
-                '}';
     }
 
     public Long getId() {
@@ -69,42 +38,13 @@ public class Board {
         this.id = id;
     }
 
-    public int getWidth() {
-        return width;
+    public String getGamestate() {
+        return gamestate;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
-    }
-//hoi
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public List<Players> getPlayers() {
-        return players;
-    }
-
-    public void setPlayers(List<Players> players) {
-        this.players = players;
-    }
-
-    public List<Spaces> getSpaces() {
-        return spaces;
-    }
-
-    public void setSpaces(List<Spaces> spaces) {
-        this.spaces = spaces;
-    }
-
-    public Board(int width, int height, List<Players> players, List<Spaces> spaces) {
-        this.width = width;
-        this.height = height;
-        this.players = players;
-        this.spaces = spaces;
+    public void setGamestate(String gamestate) {
+        this.gamestate = gamestate;
     }
 }
+
+
