@@ -4,19 +4,39 @@ import dk.dtu.compute.se.pisd.roborally.model.Heading;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
-import javax.persistence.Table;
+import javax.persistence.*;
 
-@Data
-@Embeddable
+//Data
+//@Embeddable
+//@AllArgsConstructor
+@Entity
+//@Table(name = "players")
 public class Players {
 
+//    @Column(name = "id", nullable = false)
+//    private Long id;
+//
+//    //@Id
+//    @ManyToOne
+//    @JoinColumn(name="players_id",nullable = false)
+//    private Player player;
+
+    //@Column(name = "PlayersC")
+
+    @Id
     private String name;
     private String color;
     private int x;
     private int y;
-    private Heading heading;
+    private String heading;
+
+    public Players(String name, String color, int x, int y, String heading) {
+        this.name = name;
+        this.color = color;
+        this.x = x;
+        this.y = y;
+        this.heading = heading;
+    }
 
     public Players() {
 
@@ -54,21 +74,12 @@ public class Players {
         this.y = y;
     }
 
-    public Heading getHeading() {
+    public String getHeading() {
         return heading;
     }
 
-    public void setHeading(Heading heading) {
+    public void setHeading(String heading) {
         this.heading = heading;
     }
-
-    public Players(String name, String color, int x, int y, Heading heading) {
-        this.name = name;
-        this.color = color;
-        this.x = x;
-        this.y = y;
-        this.heading = heading;
-    }
-
 }
 

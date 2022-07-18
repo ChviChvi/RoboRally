@@ -1,15 +1,15 @@
 package dk.dtu.compute.se.pisd.roborally.restfullapi;
 
-import dk.dtu.compute.se.pisd.roborally.restfullapi.model.Player;
+import dk.dtu.compute.se.pisd.roborally.restfullapi.model.Board;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/players")
 public class PlayerController {
+
 
     private final PlayerService playerService;
 
@@ -18,12 +18,38 @@ public class PlayerController {
         this.playerService = playerService;
     }
 
-    @PostMapping
-    public void registernewPlayer(@RequestBody Player player){
-        playerService.addNewPlayer(player);
+//    @PostMapping
+//    public void registernewPlayer(@RequestBody Player player){
+//        playerService.addNewPlayer(player);
+//    }
+
+    @PostMapping()
+    public ResponseEntity<Board> savePlayer(@RequestBody Board player){
+        return new ResponseEntity<Board>((Board) playerService.savePlayer(player), HttpStatus.CREATED);
+    }
+
+//    @GetMapping("/{id}")
+//    public Player read(@PathVariable String id){
+//        return playerService.find(id);
+//    }
+
+    @DeleteMapping(path = "{playerId}")
+    public void deletePlayer(@PathVariable("playerId") Long playerId) {
+        playerService.deletePlayer(playerId);
     }
 
 
+//    @PostMapping
+//    public void registernewPlayers(@RequestBody List<Player> player){
+//        playerService.save(player);
+//    }
+//
+//    @GetMapping("/list")
+//    public Iterable<Player> list() {
+//        return playerService.list();
+//    }
+
+// LIST YOU NEED LISTS
 
 //    @GetMapping
 //    public PlayerRepository getPlayers() {

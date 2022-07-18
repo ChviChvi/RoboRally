@@ -1,14 +1,9 @@
 package dk.dtu.compute.se.pisd.roborally.restfullapi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import dk.dtu.compute.se.pisd.roborally.restfullapi.model.Player;
+import dk.dtu.compute.se.pisd.roborally.restfullapi.model.Board;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,12 +17,12 @@ public class PlayerService {
         this.playerRepository = playerRepository;
     }
 
-    public List<Player> getPlayers(){
+    public List<Board> getPlayers(){
         return playerRepository.findAll();
     }
 
-    public void addNewPlayer(Player player) {
-        Optional<Player> playerOptional = playerRepository
+    public void addNewPlayer(Board player) {
+        Optional<Board> playerOptional = playerRepository
                 .findPlayersById(player.getId());
         if(playerOptional.isPresent()){
             throw new IllegalStateException("id taken");
@@ -35,18 +30,38 @@ public class PlayerService {
         playerRepository.save(player);
         //System.out.println(player);
     }
+
+    public void deletePlayer(Long playerId) {
+        boolean exists = playerRepository.existsById(playerId);
+        if(!exists){
+            throw new IllegalStateException("player with id " + playerId + "does not exist");
+        }
+        playerRepository.deleteById(playerId);
+    }
 // ----------------------------------------
-    public Player save(Player players) {
+    public Board save(Board players) {
         return playerRepository.save(players);
     }
 
-    public Iterable<Player> list() {
+    public Iterable<Board> list() {
         return playerRepository.findAll();
     }
 
-    public void save(List<Player> players) {
+    public void save(List<Board> players) {
         playerRepository.saveAll(players);
     }
+
+    //@Override
+    public Board savePlayer(Board player) {
+        return playerRepository.save(player);
+    }
+
+//    public Player find(String id) {
+//        return playerRepository.findPlayer(id);
+//    }
+
+
+
 
 
 //    public PlayerService(PlayerRepository playerService){
