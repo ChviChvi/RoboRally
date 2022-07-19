@@ -1,5 +1,6 @@
 package dk.dtu.compute.se.pisd.roborally.controller;
 
+import com.sun.xml.bind.v2.TODO;
 import dk.dtu.compute.se.pisd.roborally.RoboRally;
 import dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard;
 import dk.dtu.compute.se.pisd.roborally.model.Board;
@@ -67,9 +68,16 @@ public class AppController {
     }
 
     public void loadGame() {
+
+        // TODO > could have an http request here getting all the different files
+        ChoiceDialog<Integer> dialog = new ChoiceDialog<>(PLAYER_NUMBER_OPTIONS.get(0), PLAYER_NUMBER_OPTIONS);
+        dialog.setTitle("Player number");
+        dialog.setHeaderText("Select number of players");
+        Optional<Integer> result = dialog.showAndWait();
+
         // XXX needs to be implememted eventually
         // for now, we just create a new game
-        gameController = new GameController(LoadBoard.loadBoard("SavedGame"));
+        gameController = new GameController(LoadBoard.loadBoard("SavedGame")); //here you would have to put result
         gameController.startProgrammingPhase();
         roboRally.createBoardView(gameController);
     }
