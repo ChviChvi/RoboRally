@@ -6,6 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("api/v1/players")
 public class PlayerController {
@@ -25,27 +28,37 @@ public class PlayerController {
 
     @PostMapping()
     public ResponseEntity<Board> savePlayer(@RequestBody Board player){
+
         return new ResponseEntity<Board>((Board) playerService.savePlayer(player), HttpStatus.CREATED);
     }
 
 //    @GetMapping("/{id}")
-//    public Player read(@PathVariable String id){
-//        return playerService.find(id);
+//    public Board read(@PathVariable Long id){
+//        return playerService.findAllbyID(id);
 //    }
 
-    @DeleteMapping(path = "{playerId}")
-    public void deletePlayer(@PathVariable("playerId") Long playerId) {
+    @DeleteMapping(path = "{boardid}")
+    public void deletePlayer(@PathVariable("boardid") Long playerId) {
         playerService.deletePlayer(playerId);
     }
 
+    @GetMapping(value = "{boardid}")
+    public Optional<Board> findById(@PathVariable("boardid") Long id) {
+        return playerService.findById(id);
+    }
 
+
+    @GetMapping("/list")
+    public List<Board> getAllBoards(){
+        return playerService.getBoards();
+    }
 //    @PostMapping
 //    public void registernewPlayers(@RequestBody List<Player> player){
 //        playerService.save(player);
 //    }
 //
 //    @GetMapping("/list")
-//    public Iterable<Player> list() {
+//    public Iterable<Board> list() {
 //        return playerService.list();
 //    }
 

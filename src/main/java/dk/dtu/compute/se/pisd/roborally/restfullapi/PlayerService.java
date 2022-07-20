@@ -17,9 +17,16 @@ public class PlayerService {
         this.playerRepository = playerRepository;
     }
 
+
     public List<Board> getPlayers(){
         return playerRepository.findAll();
     }
+
+    public List<Board> getBoards(){
+        return playerRepository.findAll();
+    }
+
+
 
     public void addNewPlayer(Board player) {
         Optional<Board> playerOptional = playerRepository
@@ -29,6 +36,10 @@ public class PlayerService {
         }
         playerRepository.save(player);
         //System.out.println(player);
+    }
+
+    public Optional<Board> findById(Long id) {
+        return playerRepository.findById(id);
     }
 
     public void deletePlayer(Long playerId) {
@@ -60,14 +71,6 @@ public class PlayerService {
 //        return playerRepository.findPlayer(id);
 //    }
 
-
-
-
-
-//    public PlayerService(PlayerRepository playerService){
-//        //super();
-//        this.playerService = playerService;
-//    }
 //
 //    public PlayerRepository getPlayers() {
 //        return playerService;

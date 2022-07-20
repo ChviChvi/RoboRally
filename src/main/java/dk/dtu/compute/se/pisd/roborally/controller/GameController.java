@@ -23,6 +23,7 @@ package dk.dtu.compute.se.pisd.roborally.controller;
 
 
 import dk.dtu.compute.se.pisd.roborally.RoboRally;
+import dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard;
 import dk.dtu.compute.se.pisd.roborally.model.*;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -50,7 +51,7 @@ public class GameController  {
 
 
 
-/** moveCurrentPlayerToSpace Added -chvi */
+/** moveCurrentPlayerToSpace Added  */
 //moves the current player and switches to the next player after this move.
     public void moveCurrentPlayerToSpace(@NotNull Space space) {
         Player player = board.getCurrentPlayer();
@@ -194,6 +195,7 @@ public class GameController  {
             switch (command) {
                 case FORWARD:
                     this.moveForward(player);
+                    //LoadBoard.hell();
                     break;
                 case RIGHT:
                     this.turnRight(player);
@@ -530,7 +532,7 @@ public class GameController  {
         if(toStringCheck(space,space_43)){return true;}
         return false;
     }
-    // TODO Not working properly - Jacob
+    // TODO Not working properly
     public int Scoring(@NotNull Player player, @NotNull Space space) {
         Space player_space = player.getSpace();
 

@@ -2,6 +2,8 @@ package dk.dtu.compute.se.pisd.roborally.restfullapi.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.hibernate.annotations.BatchSize;
+import org.springframework.boot.convert.DataSizeUnit;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+
+    @Column(length=5000)
     private String gamestate;
 
     public Board(Long id, String gamestate) {

@@ -47,8 +47,8 @@ public class Player extends Subject {
     private Heading heading = SOUTH;
     private int progress = 0;
 
-    private CommandCardField[] program;
-    private CommandCardField[] cards;
+    private  CommandCardField[] program;
+    private  CommandCardField[] cards;
 
     public Player(@NotNull Board board, String color, @NotNull String name) {
         this.board = board;

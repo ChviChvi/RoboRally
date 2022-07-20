@@ -69,15 +69,16 @@ public class AppController {
 
     public void loadGame() {
 
-        // TODO > could have an http request here getting all the different files
-        ChoiceDialog<Integer> dialog = new ChoiceDialog<>(PLAYER_NUMBER_OPTIONS.get(0), PLAYER_NUMBER_OPTIONS);
-        dialog.setTitle("Player number");
-        dialog.setHeaderText("Select number of players");
+
+
+        ChoiceDialog<Integer> dialog = new ChoiceDialog<>(LoadBoard.getAllSaves().get(0), LoadBoard.getAllSaves());
+        dialog.setTitle("Saved Games");
+        dialog.setHeaderText("Select which game to load");
         Optional<Integer> result = dialog.showAndWait();
 
         // XXX needs to be implememted eventually
         // for now, we just create a new game
-        gameController = new GameController(LoadBoard.loadBoard("SavedGame")); //here you would have to put result
+        gameController = new GameController(LoadBoard.loadBoard(result)); //here you would have to put result
         gameController.startProgrammingPhase();
         roboRally.createBoardView(gameController);
     }
@@ -95,7 +96,7 @@ public class AppController {
         if (gameController != null) {
 
             // here we save the game (without asking the user).
-            saveGame();
+            //saveGame();
 
             gameController = null;
             roboRally.createBoardView(null);

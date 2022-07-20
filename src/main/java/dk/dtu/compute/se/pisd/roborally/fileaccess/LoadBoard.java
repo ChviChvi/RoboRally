@@ -21,9 +21,12 @@
  */
 package dk.dtu.compute.se.pisd.roborally.fileaccess;
 
+import dk.dtu.compute.se.pisd.roborally.model.*;
+import dk.dtu.compute.se.pisd.roborally.view.CardFieldView;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import dk.dtu.compute.se.pisd.roborally.RoboRally;
 import dk.dtu.compute.se.pisd.roborally.controller.GameController;
@@ -31,19 +34,11 @@ import dk.dtu.compute.se.pisd.roborally.fileaccess.model.BoardTemplate;
 import dk.dtu.compute.se.pisd.roborally.fileaccess.model.PlayerTemplate;
 import dk.dtu.compute.se.pisd.roborally.fileaccess.model.SpaceTemplate;
 import dk.dtu.compute.se.pisd.roborally.controller.FieldAction;
-import dk.dtu.compute.se.pisd.roborally.model.Board;
-import dk.dtu.compute.se.pisd.roborally.model.Heading;
-import dk.dtu.compute.se.pisd.roborally.model.Player;
-import dk.dtu.compute.se.pisd.roborally.model.Space;
-import dk.dtu.compute.se.pisd.roborally.restfullapi.PlayerService;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import lombok.SneakyThrows;
 
-import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -51,8 +46,14 @@ import java.net.http.HttpResponse;
 import java.io.*;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Iterator;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
+import static java.util.Objects.isNull;
 
 /**
  * ...
@@ -61,38 +62,102 @@ import java.util.List;
  */
 public class LoadBoard {
 
-    private  static final String BOARDSFOLDER = "boards";
-    private  static final String DEFAULTBOARD = "defaultboard1";
-    private  static final String JSON_EXT = "json";
+    private static final String BOARDSFOLDER = "boards";
+    private static final String DEFAULTBOARD = "defaultboard1";
+    private static final String JSON_EXT = "json";
     public static GameController gameController;
     public static RoboRally roboRally;
 
 
-    public static Board loadBoard(String boardname) {
+    public static void hell() {
+        List<String> programlist = new ArrayList<String>();
+        List<String> cardlist = new ArrayList<String>();
+
+        //System.out.println("Program Cards");
+        for (int i = 0; i < 5; i++) {
+            //System.out.println(Player.getProgramField(i).getCard());
+            if(isNull(getProgramField(i).getCard())){
+                cardlist.add("EMPTY");
+            } else {
+                String programcards = Player.getProgramField(i).getCard().getName();
+                cardlist.add(programcards);
+            }
+        }
+        //System.out.println("Command Cards");
+        for (int i = 0; i < 8; i++) {
+            if(isNull(Player.getCardField(i).getCard())){
+                programlist.add("EMPTY");
+            } else {
+                String cardcards = Player.getCardField(i).getCard().getName();
+                programlist.add(cardcards);
+            }
+        }
+
+
+        for ( String elem : programlist ) {
+            System.out.println("PROGRAMCARD : "+elem);
+        }
+        for ( String elem : cardlist ) {
+            System.out.println("COMMANDCARD : "+elem);
+        }
+
+    }
+
+    private static final HttpClient httpClient = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_2)
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
+
+
+    public static List<Integer> getAllSaves(){
+
+        //httpDEL(1030);
+
+        List<Integer> result = new ArrayList<Integer>();
+
+        /** this value might need to be changed on other pc.*/
+        for(int i=999;i<1200; i++){
+            String test = httpGETbyID(i);
+            //System.out.println(test);
+            if( !test.contains("null") && test.length() != 4){
+                result.add(i);
+            }
+        }
+        //System.out.println(result);
+        return result;
+    }
+
+    @SneakyThrows
+    public static Board loadBoard(Optional<Integer> boardname) {
 
         Board board = new Board(8,8);
-
-
         gameController = new GameController(board);
 
+        BoardTemplate template = new BoardTemplate();
+        //httpDEL(1034);
+
+        int boardsave = boardname.get();
+        //System.out.println(boardsave + " this was the value you chosE?");
+
+        //String allSaves = httpGET();
+        String allSaves = httpGETbyID(boardsave);
+        //System.out.println(allSaves);
+
+        allSaves = Decoding(allSaves);
+
+        //System.out.println(allSaves);
 
 
 
-
-        // XXX: V2
-        // board.setCurrentPlayer(board.getPlayer(0));
+        System.out.println("--------- THE GAME "+ boardsave +" IS LOADED---------");
 
 
-        JSONParser parser = new JSONParser();
         try{
+            JSONObject jsonObject = new JSONObject(allSaves);
 
-            Object obj = parser.parse(new FileReader("src/main/resources/boards/SavedGame1.json"));
-            JSONObject jsonObject = (JSONObject) obj;
-            JSONArray PlayerList = (JSONArray) jsonObject.get("players");
+            JSONArray PlayerList = jsonObject.getJSONObject("gamestate").getJSONArray("players");
 
-            //i want to extract each player from the file and put them on the board
-
-            for (int i = 0, size = PlayerList.size(); i < size; i++) {
+            for (int i = 0, size = PlayerList.length(); i < size; i++) {
                 JSONObject objectInArray = (JSONObject) PlayerList.get(i);
                 String player_name = objectInArray.get("name").toString();
                 String player_color = objectInArray.get("color").toString();
@@ -145,9 +210,12 @@ public class LoadBoard {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         gameController.startProgrammingPhase();
 
         roboRally.createBoardView(gameController);
+
+
 
 
 ///////////////////////////////////////////////////////
@@ -208,24 +276,68 @@ public class LoadBoard {
     }
 
     public static final String POST_API_URL = "http://localhost:8080/upload";
-    public static final String GET_API_URL = "http://localhost:8080/files";
+    public static final String GET_API_URL = "http://localhost:8080/api/v1/players/list";
 
 
-    public static void httpGET() throws IOException, InterruptedException {
+    public static void httpDEL(int id) {
+        try{
+            HttpRequest request = HttpRequest.newBuilder()
+                    .DELETE()
+                    .uri(URI.create("http://localhost:8080/api/v1/players/" + id))
+                    //.setHeader("User-Agent", "Product Client")
+                    .header("Content-Type", "application/json")
+                    .build();
+            CompletableFuture<HttpResponse<String>> response =
+                    httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+            String result = response.thenApply((r)->r.body()).get(5, TimeUnit.SECONDS);
+        } catch (Exception e) {
+
+        }
+    }
+    @SneakyThrows
+    public static String httpGETbyID(int id) {
+        try{
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(URI.create("http://localhost:8080/api/v1/players/" + id))
+                    //.setHeader("User-Agent", "Product Client")
+                    .header("Content-Type", "application/json")
+                    .build();
+            CompletableFuture<HttpResponse<String>> response =
+                    httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+            String result = response.thenApply((r)->r.body()).get(5, TimeUnit.SECONDS);
+
+            //System.out.println("did we get here?");
+            return result;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @SneakyThrows
+    public static String httpGET() {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
                 .uri(URI.create(GET_API_URL))
+                .header("Content-Type", "application/json")
                 .build();
-        HttpResponse<String> response = client.send(request,HttpResponse.BodyHandlers.ofString());
+//        HttpResponse<String> response = client.send(request,HttpResponse.BodyHandlers.ofString());
+//
+//        URL url = new URL(GET_API_URL);
 
-        URL url = new URL(GET_API_URL);
+        CompletableFuture<HttpResponse<String>> response =
+                httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+        String result = response.thenApply((r)->r.body()).get(5, TimeUnit.SECONDS);
 
-        System.out.println(response.body());
+        //System.out.println("----------------WE GOT HERE (2) --------------");
+
+        return result;
         //trying to download the file here
-        downloadFile(url,"SavedGame"+filecounter());
+        //downloadFile(url,"src/main/resources/boards/SavedGame"+filecounter()+".json");
     }
 
+    //TODO >> this should get the names from the database to display the choices you have
     public static void httpGETnames() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -239,16 +351,19 @@ public class LoadBoard {
 
 
         //JSONObject jsonObject = body;
-        System.out.println(response.body());
+        //System.out.println(response.body());
 
     }
 
     public static String filecounter(){
         File directory=new File("src/main/resources/boards");
-        int filecount = directory.list().length;
+        int filecount = 0;
+        if (directory.list().length > 0) {
+            filecount = directory.list().length;
+        }
         String HEY =Integer.toString(filecount);
         filecount = filecount++;
-        System.out.println("there is this many files: "+ filecount);
+        //System.out.println("there is this many files: "+ filecount);
         return HEY;
     }
 
@@ -266,6 +381,7 @@ public class LoadBoard {
         BoardTemplate template = new BoardTemplate();
         template.width = board.width;
         template.height = board.height;
+
 
 
         for (int i=0; i<board.width; i++) {
@@ -301,34 +417,182 @@ public class LoadBoard {
         // a builder (here, we want to configure the JSON serialisation with
         // a pretty printer):
         GsonBuilder simpleBuilder = new GsonBuilder().
-                registerTypeAdapter(FieldAction.class, new Adapter<FieldAction>()).
-                setPrettyPrinting();
+                registerTypeAdapter(FieldAction.class, new Adapter<FieldAction>());
+                //setPrettyPrinting();
         Gson gson = simpleBuilder.create();
 
         FileWriter fileWriter = null;
         JsonWriter writer = null;
-        try {
-            fileWriter = new FileWriter("src/main/resources/boards/SavedGame"+filecounter() +".json");
-            writer = gson.newJsonWriter(fileWriter);
-            gson.toJson(template, template.getClass(), writer);
 
+        URLConnection urlconnection = null;
 
-            writer.close();
-        } catch (IOException e1) {
-            if (writer != null) {
-                try {
-                    writer.close();
-                    fileWriter = null;
-                } catch (IOException e2) {}
-            }
-            if (fileWriter != null) {
-                try {
-                    fileWriter.close();
-                } catch (IOException e2) {}
-            }
+        String filepath = "src/main/resources/boards/Testupload" + filecounter() + ".json";
+        fileWriter = new FileWriter(filepath);
+        writer = gson.newJsonWriter(fileWriter);
+        gson.toJson(template, template.getClass(), writer);
+        writer.close();
+
+        String json_save = gson.toJson(template, template.getClass());
+        String save = gson.toJson(template, template.getClass());
+        //System.out.println(json_save);
+        if(json_save.contains("\"")) {
+            json_save = json_save.replace("\"", "&q;");
+        }
+        if(json_save.contains("{")){
+            json_save = json_save.replace("{", "@");
+        }
+        if(json_save.contains("}")){
+            json_save = json_save.replace("}", "$");
+        }
+        if(json_save.contains("[")){
+            json_save = json_save.replace("[", "?");
+        }
+        if(json_save.contains("]")){
+            json_save = json_save.replace("]", "!");
+        }
+        if(json_save.contains(":")){
+            json_save = json_save.replace(":", "-");
         }
 
-        httpGET();
+        //System.out.println(json_save);
+        //System.out.println("----------- WE GOT HERE (1) ----------------");
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+        try{
+            String testest = "{\"gamestate\":\""+json_save+"\"}";
+            //String productJSON = new Gson().toJson(testest);
+            //System.out.println(productJSON);
+            HttpRequest request = HttpRequest.newBuilder()
+                    .POST(HttpRequest.BodyPublishers.ofString(testest))
+                    .uri(URI.create("http://localhost:8080/api/v1/players"))
+                    //.setHeader("User-Agent", "Product Client")
+                    .header("Content-Type", "application/json")
+                    //.header("Content-Type", "application/json; charset=UTF-8")
+                    .build();
+
+            CompletableFuture<HttpResponse<String>> response =
+                    httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+//                String result = response.thenApply((r)->r.body()).get(5, TimeUnit.SECONDS);
+
+//                if(result.equals("added")){
+//                    System.out.println("file got saved");
+//                    System.out.println(result);
+//                } else {
+//                    System.out.println("file did NOT get saved");
+//                    System.out.println(result);
+//                }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        System.out.println("--------- THE GAME IS SAVED ---------");
+        /////////////////////////////
+//            try {
+//                URL url = new URL("http://localhost:8080/players");
+//                String postData = "gamestate"+":"+json_save;
+//                //String postData = "foo1=bar1&foo2=bar2";
+//
+//                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//                conn.setRequestMethod("POST");
+//                conn.setDoOutput(true);
+//                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+//                conn.setRequestProperty("Content-Length", Integer.toString(postData.length()));
+//                conn.setUseCaches(false);
+//
+//                try (DataOutputStream dos = new DataOutputStream(conn.getOutputStream())) {
+//                    dos.writeBytes(postData);
+//                }
+//
+//                try (BufferedReader br = new BufferedReader(new InputStreamReader(
+//                        conn.getInputStream())))
+//                {
+//                    String line;
+//                    while ((line = br.readLine()) != null) {
+//                        System.out.println(line);
+//                    }
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+
+///////////////////////////////////////////////////////////////////////////////////
+//            String query_url = "http://localhost:8080/api/v1/players";
+//            String json = gson.toJson(template, template.getClass());
+//            try {
+//                URL url = new URL(query_url);
+//                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//                conn.setConnectTimeout(5000);
+//                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+//                conn.setDoOutput(true);
+//                conn.setDoInput(true);
+//                conn.setRequestMethod("POST");
+//                OutputStream os = conn.getOutputStream();
+//                os.write(json.getBytes("UTF-8"));
+//                System.out.println(os);
+//                os.close();
+//
+//                // read the response
+//                InputStream in = new BufferedInputStream(conn.getInputStream());
+//                String result = in.toString();
+//                System.out.println(result);
+//                //System.out.println("result after Reading JSON Response");
+//                //JSONObject myResponse = new JSONObject(result);
+//                //System.out.println("jsonrpc- "+myResponse.getString("jsonrpc"));
+//                //System.out.println("id- "+myResponse.getInt("id"));
+//                //System.out.println("result- "+myResponse.getString("result"));
+//                //in.close();
+//                conn.disconnect();
+//            } catch (Exception e) {
+//                System.out.println(e);
+//            }
+
+
+///////////////////////////////////
+//            File file = new File(filepath);
+//            URL url = new URL("http://localhost:8080/upload");
+//            urlconnection = url.openConnection();
+//            urlconnection.setDoOutput(true);
+//            urlconnection.setDoInput(true);
+//System.out.println("----------- WE GOT HERE (2) ----------------");
+//            if (urlconnection instanceof HttpURLConnection) {
+//                ((HttpURLConnection) urlconnection).setRequestMethod("POST");
+//                ((HttpURLConnection) urlconnection).setRequestProperty("Content-type", "text/json");
+//                ((HttpURLConnection) urlconnection).connect();
+//            }
+//            BufferedOutputStream bos = new BufferedOutputStream(urlconnection.getOutputStream());
+//            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+//            int i;
+//            // read byte by byte until end of stream
+//            while ((i = bis.read()) > 0) {
+//                bos.write(i);
+//            }
+//            bis.close();
+//            bos.close();
+//            System.out.println(((HttpURLConnection) urlconnection).getResponseMessage());
+//            try {
+//System.out.println("----------- WE GOT HERE (3) ----------------");
+//                InputStream inputStream;
+//                int responseCode = ((HttpURLConnection) urlconnection).getResponseCode();
+//                if ((responseCode >= 200) && (responseCode <= 202)) {
+//                    inputStream = ((HttpURLConnection) urlconnection).getInputStream();
+//                    int j;
+//                    while ((j = inputStream.read()) > 0) {
+//                        System.out.println(j);
+//                    }
+//System.out.println("----------- WE GOT HERE (4) ----------------");
+//                } else {
+//                    inputStream = ((HttpURLConnection) urlconnection).getErrorStream();
+//                }
+//System.out.println("----------- WE GOT HERE (5) ----------------");
+//                ((HttpURLConnection) urlconnection).disconnect();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
+////////////////////////////////////
+
+
+        //httpGET();
 
 
 
@@ -407,7 +671,32 @@ public class LoadBoard {
     }
 
 //
-
-
+    public static String Decoding(String allSaves) {
+        if (allSaves.contains("&q;")) {
+            allSaves = allSaves.replace("&q;", "\"");
+        }
+        if (allSaves.contains("@")) {
+            allSaves = allSaves.replace("@", "{");
+        }
+        if (allSaves.contains("$")) {
+            allSaves = allSaves.replace("$", "}");
+        }
+        if (allSaves.contains("?")) {
+            allSaves = allSaves.replace("?", "[");
+        }
+        if (allSaves.contains("!")) {
+            allSaves = allSaves.replace("!", "]");
+        }
+        if (allSaves.contains("-")) {
+            allSaves = allSaves.replace("-", ":");
+        }
+        if (allSaves.contains("\"{")) {
+            allSaves = allSaves.replace("\"{", "{");
+        }
+        if (allSaves.contains("}\"}")) {
+            allSaves = allSaves.replace("}\"}", "}}");
+        }
+        return allSaves;
+    }
 }
 
