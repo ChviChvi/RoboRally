@@ -49,7 +49,7 @@ public class ConveyorBelt extends FieldAction {
 
     @Override
     public boolean doAction(@NotNull GameController gameController, @NotNull Space space) {
-//virker ikke
+
         Heading playerHeading = space.getPlayer().getHeading();
         space.getPlayer().setHeading(heading);
 

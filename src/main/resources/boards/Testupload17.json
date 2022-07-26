@@ -1,1 +1,1 @@
-{"width":8,"height":8,"spaces":[],"players":[{"name":"Player 1","color":"green","x":2,"y":0,"heading":"SOUTH"},{"name":"Player 2","color":"blue","x":2,"y":1,"heading":"SOUTH"}]}
+{"width":8,"height":8,"spaces":[],"players":[{"name":"Player 1","color":"green","x":7,"y":1,"heading":"SOUTH"},{"name":"Player 2","color":"blue","x":1,"y":6,"heading":"SOUTH"},{"name":"Player 3","color":"red","x":0,"y":7,"heading":"SOUTH"},{"name":"Player 4","color":"brown","x":0,"y":4,"heading":"SOUTH"},{"name":"Player 5","color":"pink","x":2,"y":1,"heading":"SOUTH"}]}

@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 import static java.lang.System.exit;
+import static java.util.Objects.isNull;
 
 /**
  * ...
@@ -79,11 +80,51 @@ public class GameController  {
                 for (int j = 0; j < Player.NO_CARDS; j++) {
                     CommandCardField field = player.getCardField(j);
                     field.setCard(generateRandomCommandCard());
+                    //field.setCard(null);
                     field.setVisible(true);
                 }
             }
         }
     }
+
+    public void LoadCards() {
+        board.setPhase(Phase.PROGRAMMING);
+        board.setCurrentPlayer(board.getPlayer(0));
+        board.setStep(0);
+
+        for (int i = 0; i < board.getPlayersNumber(); i++) {
+            Player player = board.getPlayer(i);
+            if (player != null) {
+                for (int j = 0; j < Player.NO_REGISTERS; j++) {
+                    CommandCardField field = player.getProgramField(j);
+                    field.setCard(null);
+                    field.setVisible(true);
+                }
+                for (int j = 0; j < Player.NO_CARDS; j++) {
+                    CommandCardField field = player.getCardField(j);
+                    if(isNull(player.getCardField(j).getCard())) {
+                       field.setCard(generateRandomCommandCard());
+                    }
+                    //else {field.setCard(null);}
+                    //field.setCard(null);
+                    field.setVisible(true);
+                }
+            }
+        }
+    }
+    public int checkifnull(Player currentPlayer){
+        int cardnumber = 1;
+
+        for(int j = 1; j < Player.NO_CARDS; j++){
+            if(isNull(currentPlayer.getCardField(j).getCard())) {
+                cardnumber = j;
+                return cardnumber;
+            }
+        }
+        return cardnumber;
+    }
+
+
 
     // XXX: V2
     private CommandCard generateRandomCommandCard() {
@@ -172,7 +213,10 @@ public class GameController  {
                         board.setStep(step);
                         board.setCurrentPlayer(board.getPlayer(0));
                     } else {
-                        startProgrammingPhase();
+                        LoadCards();
+                        //System.out.println("THE GAME DESTROYED UP BECAUSE OF THIS");
+                        //startProgrammingPhase();
+                        //assert false;
                     }
                 }
             } else {
@@ -184,6 +228,8 @@ public class GameController  {
             assert false;
         }
     }
+
+
 
     // XXX: V2
     private void executeCommand(@NotNull Player player, Command command) {

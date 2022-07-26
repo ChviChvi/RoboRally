@@ -79,7 +79,7 @@ public class AppController {
         // XXX needs to be implememted eventually
         // for now, we just create a new game
         gameController = new GameController(LoadBoard.loadBoard(result)); //here you would have to put result
-        gameController.startProgrammingPhase();
+        //gameController.startProgrammingPhase();
         roboRally.createBoardView(gameController);
     }
 

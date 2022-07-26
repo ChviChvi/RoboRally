@@ -23,6 +23,7 @@ package dk.dtu.compute.se.pisd.roborally.fileaccess;
 
 import dk.dtu.compute.se.pisd.roborally.model.*;
 import dk.dtu.compute.se.pisd.roborally.view.CardFieldView;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import com.google.gson.Gson;
@@ -48,11 +49,13 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import static dk.dtu.compute.se.pisd.roborally.model.Command.*;
 import static java.util.Objects.isNull;
 
 /**
@@ -68,39 +71,78 @@ public class LoadBoard {
     public static GameController gameController;
     public static RoboRally roboRally;
 
+    private Player player;
+    private static CommandCard card;
+    private Command command;
+    private CommandCardField commandCardField;
 
-    public static void hell() {
-        List<String> programlist = new ArrayList<String>();
-        List<String> cardlist = new ArrayList<String>();
+
+    //CommandCardField cardField;
+    String cardField;
+
+    @Override
+    public String toString() {
+        return "LoadBoard{" +
+                "cardField=" + cardField +
+                '}';
+    }
+    public static String stringcommandcards(@NotNull Player player) {
+        List<String> COMMANDCARDLIST = new ArrayList<String>();
+
+        //System.out.println("Command Cards");
+        for (int i = 0; i < 8; i++) {
+            if(isNull(player.getCardField(i).getCard())){
+                COMMANDCARDLIST.add("EMPTY");
+            } else {
+                String cardcards = player.getCardField(i).getCard().getName();
+                COMMANDCARDLIST.add(cardcards);
+            }
+        }
+
+        String String_program = String.join(",",COMMANDCARDLIST);
+
+//        for ( String elem : COMMANDCARDLIST ) {
+//            System.out.println("PROGRAMCARD : "+elem);
+//        }
+
+        return String_program;
+    }
+    public static String stringprogramcards(@NotNull Player player) {
+        //List<String> COMMANDCARDLIST = new ArrayList<String>();
+        List<String> PROGRAMFIELDLIST = new ArrayList<String>();
+
 
         //System.out.println("Program Cards");
         for (int i = 0; i < 5; i++) {
             //System.out.println(Player.getProgramField(i).getCard());
-            if(isNull(getProgramField(i).getCard())){
-                cardlist.add("EMPTY");
+            if(isNull(player.getProgramField(i).getCard())){
+                PROGRAMFIELDLIST.add("EMPTY");
             } else {
-                String programcards = Player.getProgramField(i).getCard().getName();
-                cardlist.add(programcards);
+                //String cardField = player.getProgramField(i).getCard().getName();
+                String programcards = player.getProgramField(i).getCard().getName();
+                PROGRAMFIELDLIST.add(programcards);
             }
         }
         //System.out.println("Command Cards");
-        for (int i = 0; i < 8; i++) {
-            if(isNull(Player.getCardField(i).getCard())){
-                programlist.add("EMPTY");
-            } else {
-                String cardcards = Player.getCardField(i).getCard().getName();
-                programlist.add(cardcards);
-            }
-        }
+//        for (int i = 0; i < 8; i++) {
+//            if(isNull(player.getCardField(i).getCard())){
+//                COMMANDCARDLIST.add("EMPTY");
+//            } else {
+//                String cardcards = player.getCardField(i).getCard().getName();
+//                COMMANDCARDLIST.add(cardcards);
+//            }
+//        }
 
+//        String String_program = String.join(",",COMMANDCARDLIST);
+        String String_card = String.join(",",PROGRAMFIELDLIST);
 
-        for ( String elem : programlist ) {
-            System.out.println("PROGRAMCARD : "+elem);
-        }
-        for ( String elem : cardlist ) {
-            System.out.println("COMMANDCARD : "+elem);
-        }
-
+//        for ( String elem : COMMANDCARDLIST ) {
+//            System.out.println("PROGRAMCARD : "+elem);
+//        }
+//        for ( String elem : PROGRAMFIELDLIST ) {
+//            System.out.println("COMMANDCARD : "+elem);
+//        }
+        return String_card;
     }
 
     private static final HttpClient httpClient = HttpClient.newBuilder()
@@ -110,13 +152,11 @@ public class LoadBoard {
 
 
     public static List<Integer> getAllSaves(){
-
         //httpDEL(1030);
-
         List<Integer> result = new ArrayList<Integer>();
 
         /** this value might need to be changed on other pc.*/
-        for(int i=999;i<1200; i++){
+        for(int i=999;i<1100; i++){
             String test = httpGETbyID(i);
             //System.out.println(test);
             if( !test.contains("null") && test.length() != 4){
@@ -133,6 +173,10 @@ public class LoadBoard {
         Board board = new Board(8,8);
         gameController = new GameController(board);
 
+        board.setPhase(Phase.PROGRAMMING);
+        board.setCurrentPlayer(board.getPlayer(0));
+        board.setStep(0);
+
         BoardTemplate template = new BoardTemplate();
         //httpDEL(1034);
 
@@ -145,7 +189,7 @@ public class LoadBoard {
 
         allSaves = Decoding(allSaves);
 
-        //System.out.println(allSaves);
+        System.out.println(allSaves);
 
 
 
@@ -154,8 +198,8 @@ public class LoadBoard {
 
         try{
             JSONObject jsonObject = new JSONObject(allSaves);
-
             JSONArray PlayerList = jsonObject.getJSONObject("gamestate").getJSONArray("players");
+            JSONArray CardList = jsonObject.getJSONObject("gamestate").getJSONArray("cards");
 
             for (int i = 0, size = PlayerList.length(); i < size; i++) {
                 JSONObject objectInArray = (JSONObject) PlayerList.get(i);
@@ -164,12 +208,6 @@ public class LoadBoard {
                 String player_x = objectInArray.get("x").toString();
                 String player_y = objectInArray.get("y").toString();
                 String player_heading = objectInArray.get("heading").toString();
-
-//                System.out.println(player_name);
-//                System.out.println(player_color);
-//                System.out.println(player_x);
-//                System.out.println(player_y);
-                //System.out.println(player_heading);
 
                 int x_parced = Integer.parseInt(player_x);
                 int y_parced = Integer.parseInt(player_y);
@@ -182,6 +220,139 @@ public class LoadBoard {
                 if(player_heading.equals("EAST")){player.setHeading(Heading.EAST);}
                 if(player_heading.equals("SOUTH")){player.setHeading(Heading.SOUTH);}
 
+
+            }
+
+            for (int i = 0, size = CardList.length(); i < size; i++) {
+                JSONObject objectInArray = (JSONObject) CardList.get(i);
+                String player_names = objectInArray.get("name").toString();
+                String command_names = objectInArray.get("commandcards").toString();
+                if (command_names.contains("U:T")) {
+                    command_names = command_names.replace("U:T", "U-T");
+                }
+                String program_names = objectInArray.get("programcards").toString();
+                if (program_names.contains("U:T")) {
+                    program_names = program_names.replace("U:T", "U-T");
+                }
+
+                // put these two strings in two different arrays, and then through a forloop set cards :) DONE :D
+
+                String strC[] = command_names.split(",");
+                String strP[] = program_names.split(",");
+
+                List<String> listC = new ArrayList<String>();
+                List<String> listP = new ArrayList<String>();
+
+                listC = Arrays.asList(strC);
+                listP = Arrays.asList(strP);
+
+                System.out.println("LISTC");
+                for(String c: listC){
+                    System.out.println(c);
+                }
+                System.out.println("LISTP");
+                for(String c: listP){
+                    System.out.println(c);
+                }
+
+                //board.setPhase(Phase.PROGRAMMING);
+                //board.setCurrentPlayer(board.getPlayer(0));
+                //board.setStep(0);
+
+                Player player = board.getPlayer(i);
+                board.setCurrentPlayer(player);
+                if (player != null) {
+                    for (int j = 0; j < Player.NO_CARDS; j++) {
+                        //System.out.println("this happened(111111111)");
+                        CommandCardField field = player.getCardField(j);
+                        String cardfromlist = listC.get(j);
+                        if(isNull(checkCard(cardfromlist))){
+                            field.setCard(null);
+                        } else{
+                            field.setCard(new CommandCard(checkCard(cardfromlist)));
+                        }
+                        field.setVisible(true);
+                        //System.out.println(player.getCardField(1).getCard().getName());
+                        //if(isNull(player.getCardField(j).getCard())){
+                        //    System.out.println("this is working!!!");}
+
+                    }
+                    for (int j = 0; j < Player.NO_REGISTERS; j++) {
+                        CommandCardField field = player.getProgramField(j);
+                        String cardfromlist = listP.get(j);
+                        if(isNull(checkCard(cardfromlist))){
+                            field.setCard(null);
+                        } else {
+                            field.setCard(new CommandCard(checkCard(cardfromlist)));
+                        }
+                        field.setVisible(true);
+                        //if(isNull(player.getCardField(1))){
+                        //    System.out.println("this is working!!!");
+                        //}
+                    }
+                }
+
+
+
+                ///////for(int j = 0; j < listC.size(); j++) {
+                ///////    player.getCardField(j).setCard(null);
+                ///////    player.getCardField(j).setVisible(true);
+                    //CommandCardField field1 = new CommandCardField(player);
+                    //field1.setCard(null);
+
+
+
+
+                    //CommandCardField fields = new CommandCardField(player);
+                    //CommandCardField field = player.getCardField(j);
+                    //veltje.
+                    //fields.setCard(card(FORWARD));
+
+                    //field.setCard(null);
+                    //field.setVisible(true);
+//                    if (listC.get(j).contains("EMPTY")) {
+//                        field.setCard(null);
+//                        field.setVisible(true);
+//                    } else {
+//                        field.setCard(new CommandCard(Command.FORWARD));
+//                    }
+                ///////}
+                //Player player = board.getPlayer(i);
+                ///////for(int j = 0; j < listP.size(); j++) {
+                ///////    player.getProgramField(j).setCard(null);
+                ///////    player.getProgramField(j).setVisible(true);
+                    //CommandCardField field = new CommandCardField(player);
+                    //CommandCardField field = player.getProgramField(j);
+                    //veltje.
+                    //field.setCard(new CommandCard(FORWARD));
+                    //field.setVisible(true);
+//                    if (listC.get(j).contains("EMPTY")) {
+//                        field.setCard(null);
+//                        field.setVisible(true);
+//                    } else {
+//                        field.setCard(new CommandCard(Command.FORWARD));
+//                    }
+                ///////}
+
+
+                System.out.println(toString(player));
+                System.out.println(command_names);
+                System.out.println(program_names);
+                //Player player = board.getPlayer(i);
+
+
+                //card_names = card_names.replace()
+
+//                for (int j = 0; j < Player.NO_REGISTERS; j++) {
+//                    CommandCardField field = player.getProgramField(j);
+//                    field.setCard(null);
+//                    field.setVisible(true);
+//                }
+//                for (int j = 0; j < Player.NO_CARDS; j++) {
+//                    CommandCardField field = player.getCardField(j);
+//                    field.setCard(generateRandomCommandCard());
+//                    field.setVisible(true);
+//                }
             }
 
 //                "name": "Player 1",
@@ -206,14 +377,19 @@ public class LoadBoard {
 //            while (iterator.hasNext()) {
 //                System.out.println(iterator.next());
 //        }
+
+
             return board;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        gameController.startProgrammingPhase();
 
-        roboRally.createBoardView(gameController);
+
+
+        //gameController.startProgrammingPhase();
+
+        //roboRally.createBoardView(gameController);
 
 
 
@@ -273,6 +449,10 @@ public class LoadBoard {
 //            }
 //        }
         return null;
+    }
+
+    private static String toString(Player player) {
+        return player.getName();
     }
 
     public static final String POST_API_URL = "http://localhost:8080/upload";
@@ -382,7 +562,35 @@ public class LoadBoard {
         template.width = board.width;
         template.height = board.height;
 
+        List<String> playerscards = new ArrayList<String>();
 
+        for (int i = 0; i < board.getPlayersNumber(); i++) {
+            System.out.println("Cards for player "+ i);
+            Player player = board.getPlayer(i);
+            if (player != null) {
+                String command_cards = stringcommandcards(player);
+
+                String program_cards = stringprogramcards(player);
+                System.out.println(command_cards);
+                System.out.println(program_cards);
+
+                String jsoncards = "{\"name\":\"Player "+i+"\",\"commandcards\":\""+command_cards+"\",\"programcards\":\""+program_cards+"\"}";
+                playerscards.add(jsoncards);
+//
+//                for (int j = 0; j < Player.NO_REGISTERS; j++) {
+//
+//                }
+//                for (int j = 0; j < Player.NO_CARDS; j++) {
+//                    CommandCardField field = player.getCardField(j);
+//                    field.setCard(generateRandomCommandCard());
+//                    field.setVisible(true);
+//                }
+            }
+        }
+
+        String playercardsjson = String.join(",",playerscards);
+        System.out.println("check of dit goed is" + playercardsjson);
+        //hell(gameController.board.getPlayer(i));
 
         for (int i=0; i<board.width; i++) {
             for (int j=0; j<board.height; j++) {
@@ -433,27 +641,16 @@ public class LoadBoard {
         writer.close();
 
         String json_save = gson.toJson(template, template.getClass());
-        String save = gson.toJson(template, template.getClass());
-        //System.out.println(json_save);
-        if(json_save.contains("\"")) {
-            json_save = json_save.replace("\"", "&q;");
-        }
-        if(json_save.contains("{")){
-            json_save = json_save.replace("{", "@");
-        }
-        if(json_save.contains("}")){
-            json_save = json_save.replace("}", "$");
-        }
-        if(json_save.contains("[")){
-            json_save = json_save.replace("[", "?");
-        }
-        if(json_save.contains("]")){
-            json_save = json_save.replace("]", "!");
-        }
-        if(json_save.contains(":")){
-            json_save = json_save.replace(":", "-");
-        }
+        //String save = gson.toJson(template, template.getClass());
+        System.out.println(json_save);
 
+
+        if (json_save.contains("\"}]}")) {
+            json_save = json_save.replace("\"}]}", "\"}],\"cards\":["+ playercardsjson +"]}");
+
+        }
+        System.out.println(json_save);
+        json_save = Encoding(json_save);
         //System.out.println(json_save);
         //System.out.println("----------- WE GOT HERE (1) ----------------");
 
@@ -461,8 +658,9 @@ public class LoadBoard {
 //////////////////////////////////////////////////////////////////////////////////////////
         try{
             String testest = "{\"gamestate\":\""+json_save+"\"}";
+            //String testest = "{\"gamestate\":\""+json_save+","+ "\"}";
             //String productJSON = new Gson().toJson(testest);
-            //System.out.println(productJSON);
+            System.out.println(testest);
             HttpRequest request = HttpRequest.newBuilder()
                     .POST(HttpRequest.BodyPublishers.ofString(testest))
                     .uri(URI.create("http://localhost:8080/api/v1/players"))
@@ -671,6 +869,29 @@ public class LoadBoard {
     }
 
 //
+
+    public static String Encoding(String json_save){
+        if(json_save.contains("\"")) {
+            json_save = json_save.replace("\"", "&q;");
+        }
+        if(json_save.contains("{")){
+            json_save = json_save.replace("{", "@");
+        }
+        if(json_save.contains("}")){
+            json_save = json_save.replace("}", "$");
+        }
+        if(json_save.contains("[")){
+            json_save = json_save.replace("[", "?");
+        }
+        if(json_save.contains("]")){
+            json_save = json_save.replace("]", "!");
+        }
+        if(json_save.contains(":")){
+            json_save = json_save.replace(":", "-");
+        }
+        return json_save;
+    }
+
     public static String Decoding(String allSaves) {
         if (allSaves.contains("&q;")) {
             allSaves = allSaves.replace("&q;", "\"");
@@ -697,6 +918,38 @@ public class LoadBoard {
             allSaves = allSaves.replace("}\"}", "}}");
         }
         return allSaves;
+    }
+
+    public static Command checkCard(String fromlist){
+
+        if( fromlist.equals("Fast Fwd")){
+            return FAST_FORWARD;
+        }
+        if( fromlist.equals("Triple Fwd")){
+            return TRIPLE_FORWARD;
+        }
+        if( fromlist.equals("U-Turn")){
+            return U_TURN;
+        }
+        if( fromlist.equals("Fwd")){
+            return FORWARD;
+        }
+        if( fromlist.equals("Move Back")){
+            return BACKUP;
+        }
+        if( fromlist.equals("SANDBOX ROUTINE")){
+            return SANDBOX_ROUTINE;
+        }
+        if( fromlist.equals("WEASEL ROUTINE")){
+            return WEASEL_ROUTINE;
+        }
+        if( fromlist.equals("Turn Left")){
+            return LEFT;
+        }
+        if( fromlist.equals("Turn Right")){
+            return RIGHT;
+        }
+        return null;
     }
 }
 
