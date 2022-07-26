@@ -67,7 +67,7 @@ public class LoadBoard {
 
     private static final String BOARDSFOLDER = "boards";
     private static final String DEFAULTBOARD = "defaultboard1";
-    private static final String JSON_EXT = "json";
+    //private static final String JSON_EXT = "json";
     public static GameController gameController;
     public static RoboRally roboRally;
 

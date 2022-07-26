@@ -112,18 +112,6 @@ public class GameController  {
             }
         }
     }
-    public int checkifnull(Player currentPlayer){
-        int cardnumber = 1;
-
-        for(int j = 1; j < Player.NO_CARDS; j++){
-            if(isNull(currentPlayer.getCardField(j).getCard())) {
-                cardnumber = j;
-                return cardnumber;
-            }
-        }
-        return cardnumber;
-    }
-
 
 
     // XXX: V2

@@ -24,18 +24,25 @@ package dk.dtu.compute.se.pisd.roborally.view;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import dk.dtu.compute.se.pisd.roborally.model.Player;
 import dk.dtu.compute.se.pisd.roborally.model.Space;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.*;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import javax.swing.text.Element;
 import javax.swing.text.html.ImageView;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 /**
  * ...
@@ -66,9 +73,9 @@ public class SpaceView extends StackPane implements ViewObserver {
 
 
         if ((space.x + space.y) % 2 == 0) {
-            this.setStyle("-fx-background-color: white;");
+            this.setStyle("-fx-background-color: #2C5F2D;");
         } else {
-            this.setStyle("-fx-background-color: black;");
+            this.setStyle("-fx-background-color: #97BC62FF;");
         }
 
 
@@ -161,7 +168,7 @@ public class SpaceView extends StackPane implements ViewObserver {
         Polygon fig = new Polygon(0.0, 5.0,
                 55.0, 5.0,
                 30.0, 55.0);
-        fig.setFill(Color.PURPLE);
+        fig.setFill(Color.PEACHPUFF);
         String north = "NORTH";
         String east = "EAST";
         String south = "SOUTH";
@@ -186,7 +193,7 @@ public class SpaceView extends StackPane implements ViewObserver {
         if (space.x == 4 && space.y == 0) {
             Canvas canvas = new Canvas(SPACE_WIDTH, SPACE_HEIGHT);
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.setStroke(Color.GREEN);
+            gc.setStroke(Color.TOMATO);
             gc.setLineWidth(10);
             gc.setLineCap(StrokeLineCap.ROUND);
             //vertical left side line//
@@ -196,7 +203,7 @@ public class SpaceView extends StackPane implements ViewObserver {
         if (space.x == 4 && space.y == 1) {
             Canvas canvas = new Canvas(SPACE_WIDTH, SPACE_HEIGHT);
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.setStroke(Color.GREEN);
+            gc.setStroke(Color.TOMATO);
             gc.setLineWidth(10);
             gc.setLineCap(StrokeLineCap.ROUND);
             //vertical left side line//
@@ -206,7 +213,7 @@ public class SpaceView extends StackPane implements ViewObserver {
         if (space.x == 5 && space.y == 1) {
             Canvas canvas = new Canvas(SPACE_WIDTH, SPACE_HEIGHT);
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.setStroke(Color.GREEN);
+            gc.setStroke(Color.TOMATO);
             gc.setLineWidth(10);
             gc.setLineCap(StrokeLineCap.ROUND);
             //horizontal buttom side line//
@@ -216,7 +223,7 @@ public class SpaceView extends StackPane implements ViewObserver {
         if (space.x == 6 && space.y == 2) {
             Canvas canvas = new Canvas(SPACE_WIDTH, SPACE_HEIGHT);
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.setStroke(Color.GREEN);
+            gc.setStroke(Color.TOMATO);
             gc.setLineWidth(10);
             gc.setLineCap(StrokeLineCap.ROUND);
             //vertical left side line//
@@ -226,7 +233,7 @@ public class SpaceView extends StackPane implements ViewObserver {
         if (space.x == 6 && space.y == 3) {
             Canvas canvas = new Canvas(SPACE_WIDTH, SPACE_HEIGHT);
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.setStroke(Color.GREEN);
+            gc.setStroke(Color.TOMATO);
             gc.setLineWidth(10);
             gc.setLineCap(StrokeLineCap.ROUND);
             //vertical left side line//
@@ -236,7 +243,7 @@ public class SpaceView extends StackPane implements ViewObserver {
         if (space.x == 6 && space.y == 5) {
             Canvas canvas = new Canvas(SPACE_WIDTH, SPACE_HEIGHT);
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.setStroke(Color.GREEN);
+            gc.setStroke(Color.TOMATO);
             gc.setLineWidth(10);
             gc.setLineCap(StrokeLineCap.ROUND);
             //vertical left side line//
@@ -246,7 +253,7 @@ public class SpaceView extends StackPane implements ViewObserver {
         if (space.x == 6 && space.y == 6) {
             Canvas canvas = new Canvas(SPACE_WIDTH, SPACE_HEIGHT);
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.setStroke(Color.GREEN);
+            gc.setStroke(Color.TOMATO);
             gc.setLineWidth(10);
             gc.setLineCap(StrokeLineCap.ROUND);
             //vertical left side line//
@@ -256,7 +263,7 @@ public class SpaceView extends StackPane implements ViewObserver {
         if (space.x == 5 && space.y == 6) {
             Canvas canvas = new Canvas(SPACE_WIDTH, SPACE_HEIGHT);
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.setStroke(Color.GREEN);
+            gc.setStroke(Color.TOMATO);
             gc.setLineWidth(10);
             gc.setLineCap(StrokeLineCap.ROUND);
             //horizontal buttom side line//
@@ -266,7 +273,7 @@ public class SpaceView extends StackPane implements ViewObserver {
         if (space.x == 4 && space.y == 6) {
             Canvas canvas = new Canvas(SPACE_WIDTH, SPACE_HEIGHT);
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.setStroke(Color.GREEN);
+            gc.setStroke(Color.TOMATO);
             gc.setLineWidth(10);
             gc.setLineCap(StrokeLineCap.ROUND);
             //horizontal buttom side line//
@@ -276,7 +283,7 @@ public class SpaceView extends StackPane implements ViewObserver {
         if (space.x == 3 && space.y == 6) {
             Canvas canvas = new Canvas(SPACE_WIDTH, SPACE_HEIGHT);
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.setStroke(Color.GREEN);
+            gc.setStroke(Color.TOMATO);
             gc.setLineWidth(10);
             gc.setLineCap(StrokeLineCap.ROUND);
             //horizontal buttom side line//
@@ -286,7 +293,7 @@ public class SpaceView extends StackPane implements ViewObserver {
         if (space.x == 2 && space.y == 6) {
             Canvas canvas = new Canvas(SPACE_WIDTH, SPACE_HEIGHT);
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.setStroke(Color.GREEN);
+            gc.setStroke(Color.TOMATO);
             gc.setLineWidth(10);
             gc.setLineCap(StrokeLineCap.ROUND);
             //horizontal buttom side line//
@@ -296,7 +303,7 @@ public class SpaceView extends StackPane implements ViewObserver {
         if (space.x == 1 && space.y == 6) {
             Canvas canvas = new Canvas(SPACE_WIDTH, SPACE_HEIGHT);
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.setStroke(Color.GREEN);
+            gc.setStroke(Color.TOMATO);
             gc.setLineWidth(10);
             gc.setLineCap(StrokeLineCap.ROUND);
             //horizontal buttom side line//
@@ -306,7 +313,7 @@ public class SpaceView extends StackPane implements ViewObserver {
         if (space.x == 1 && space.y == 5) {
             Canvas canvas = new Canvas(SPACE_WIDTH, SPACE_HEIGHT);
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.setStroke(Color.GREEN);
+            gc.setStroke(Color.TOMATO);
             gc.setLineWidth(10);
             gc.setLineCap(StrokeLineCap.ROUND);
             //horizontal buttom side line//
@@ -320,49 +327,87 @@ public class SpaceView extends StackPane implements ViewObserver {
 
         Player player = space.getPlayer();
         if (player != null) {
+            Arc arc = new Arc();
+            arc.setCenterX(50.0f);
+            arc.setCenterY(50.0f);
+            arc.setRadiusX(20.0f);
+            arc.setRadiusY(20.0f);
+            arc.setStartAngle(45.0f);
+            arc.setLength(270.0f);
+            arc.setType(ArcType.ROUND);
+
+
+            Canvas canvas = new Canvas(SPACE_WIDTH, SPACE_HEIGHT);
+            GraphicsContext gc = canvas.getGraphicsContext2D();
+            gc.setFill(Color.BLACK);
+            gc.fillOval(28.5,17.5,8.5,8.5);
+            //gc.rotate(90);
+            Canvas canvas1 = new Canvas(SPACE_WIDTH, SPACE_HEIGHT);
+            GraphicsContext gc1 = canvas.getGraphicsContext2D();
+            gc1.setFill(Color.WHITE);
+            gc1.fillOval(29.5,18.5,3.5,3.5);
+            //gc1.rotate(90);
+
+
+//            Circle circle = new Circle();
+//            circle.setFill(Color.WHITE);
+//            circle.setRadius(5);
+
+
             Polygon arrow = new Polygon(0.0, 0.0,
                     10.0, 20.0,
                     20.0, 0.0);
             try {
-                arrow.setFill(Color.valueOf(player.getColor()));
+                arc.setFill(Color.valueOf(player.getColor()));
             } catch (Exception e) {
-                arrow.setFill(Color.MEDIUMPURPLE);
+                arc.setFill(Color.MEDIUMPURPLE);
             }
 
-            arrow.setRotate((90 * player.getHeading().ordinal()) % 360);
-            this.getChildren().addAll(arrow);
+
+            canvas1.setRotate((90 * player.getHeading().ordinal()) % 360);
+            canvas.setRotate((90 * player.getHeading().ordinal()) % 360);
+            arc.setRotate((90 * player.getHeading().ordinal()) % 360);
+
+            canvas1.setRotate(90 % 360);
+            canvas.setRotate(90 % 360);
+            arc.setRotate(90 % 360);
+
+            this.getChildren().addAll(arc,canvas,canvas1);
+
         }
 
     }
-    private void updateCP() {
+    @SneakyThrows
+    private void updateCP()  {
+        FileInputStream input = new FileInputStream("C:/Users/Chris/IdeaProjects/projectproject2/src/main/java/dk/dtu/compute/se/pisd/roborally/view/picture/minesweeperflag.png");
 
 
-        if (space.x == 6 && space.y == 6) {
-            this.setStyle("-fx-background-color: Orange");
-            Label cp1 = new Label("1");
-            cp1.setFont(Font.font("Tahoma",40));
-            cp1.setTextFill(Color.AQUA);
+        if (space.x == 6 && space.y == 4) {
+            this.setStyle("-fx-background-color: #343148FF");
+            Label cp1 = new Label("3");
+            cp1.setFont(Font.font("Impact",45));
+            cp1.setTextFill(Color.PEACHPUFF);
             this.getChildren().add(cp1);
         }
-        if (space.x == 1 && space.y == 5) {
-            this.setStyle("-fx-background-color: Orange");
+        if (space.x == 0 && space.y == 4) {
+            this.setStyle("-fx-background-color: #343148FF");
             Label cp2 = new Label("2");
-            cp2.setFont(Font.font("Tahoma",40));
-            cp2.setTextFill(Color.AQUA);
+            cp2.setFont(Font.font("Impact",45));
+            cp2.setTextFill(Color.PEACHPUFF);
             this.getChildren().add(cp2);
         }
-        if (space.x == 5 && space.y == 0) {
-            this.setStyle("-fx-background-color: Orange");
-            Label cp3 = new Label("3");
-            cp3.setFont(Font.font("Tahoma",40));
-            cp3.setTextFill(Color.AQUA);
+        if (space.x == 4 && space.y == 1) {
+            this.setStyle("-fx-background-color: #343148FF");
+            Label cp3 = new Label("4");
+            cp3.setFont(Font.font("Impact",45));
+            cp3.setTextFill(Color.PEACHPUFF);
             this.getChildren().add(cp3);
         }
-        if (space.x == 4 && space.y == 3) {
-            this.setStyle("-fx-background-color: Orange");
-            Label cp4 = new Label("4");
-            cp4.setFont(Font.font("Tahoma",40));
-            cp4.setTextFill(Color.AQUA);
+        if (space.x == 5 && space.y == 6) {
+            this.setStyle("-fx-background-color: #343148FF");
+            Label cp4 = new Label("1");
+            cp4.setFont(Font.font("Impact",45));
+            cp4.setTextFill(Color.PEACHPUFF);
             this.getChildren().add(cp4);
         }
     }
