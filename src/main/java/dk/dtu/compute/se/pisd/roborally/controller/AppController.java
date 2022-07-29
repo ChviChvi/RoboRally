@@ -68,9 +68,6 @@ public class AppController {
     }
 
     public void loadGame() {
-
-
-
         ChoiceDialog<Integer> dialog = new ChoiceDialog<>(LoadBoard.getAllSaves().get(0), LoadBoard.getAllSaves());
         dialog.setTitle("Saved Games");
         dialog.setHeaderText("Select which game to load");
@@ -123,6 +120,29 @@ public class AppController {
         if (gameController == null || stopGame()) {
             Platform.exit();
         }
+    }
+
+    public void gameisdone(String playernumber) throws IOException, InterruptedException {
+
+
+
+        //if (gameController != null) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Exit RoboRally?");
+            alert.setContentText("Are you sure you want to exit RoboRally?");
+            Optional<ButtonType> result = alert.showAndWait();
+
+            if (!result.isPresent() || result.get() != ButtonType.OK) {
+                //if(result.get() == ButtonType.OK){
+                this.roboRally.createBoardView(null);
+               // }
+                return; // return without exiting the application
+            }
+       // }
+
+        // If the user did not cancel, the RoboRally application will exit
+        // after the option to save the game
+
     }
 
     public boolean isGameRunning() {

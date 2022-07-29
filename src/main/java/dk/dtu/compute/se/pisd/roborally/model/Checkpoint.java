@@ -18,11 +18,10 @@ public class Checkpoint extends FieldAction {
 
     @Override
     public boolean doAction(@NotNull GameController gameController, @NotNull Space space) {
-    // TODO Fix method - Jacob
         Player player = space.getPlayer();
 
         if (player.getProgress() == value - 1) {
-            gameController.Scoring(player,space);
+            gameController.Scoring(player,space, gameController.board);
         }
         System.out.println(player.getProgress());
         return true;

@@ -24,6 +24,8 @@ package dk.dtu.compute.se.pisd.roborally.model;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+
 import static dk.dtu.compute.se.pisd.roborally.model.Heading.SOUTH;
 
 /**
@@ -47,16 +49,22 @@ public class Player extends Subject {
     private Heading heading = SOUTH;
     private int progress = 0;
 
+    private ArrayList<Integer> checkpoints;
+
+
+
     private  CommandCardField[] program;
     private  CommandCardField[] cards;
 
-    public Player(@NotNull Board board, String color, @NotNull String name) {
+    public Player(@NotNull Board board, String color, @NotNull String name ) {
         this.board = board;
         this.name = name;
         this.color = color;
-
+        //this.checkpoints = checkpoints;
 
         this.space = null;
+
+        checkpoints = new ArrayList<>();
 
         program = new CommandCardField[NO_REGISTERS];
         for (int i = 0; i < program.length; i++) {
@@ -67,6 +75,23 @@ public class Player extends Subject {
         for (int i = 0; i < cards.length; i++) {
             cards[i] = new CommandCardField(this);
         }
+    }
+
+    public ArrayList<Integer> getCheckpoints() {
+        return checkpoints;
+    }
+
+    public void setCheckpoints(ArrayList<Integer> checkpoints, int addedcheckpoint) {
+        this.checkpoints = checkpoints;
+
+        if(!checkpoints.contains(addedcheckpoint) && addedcheckpoint==1)
+        checkpoints.add(addedcheckpoint);
+        if(!checkpoints.contains(addedcheckpoint) && addedcheckpoint==2)
+            checkpoints.add(addedcheckpoint);
+        if(!checkpoints.contains(addedcheckpoint) && addedcheckpoint==3)
+            checkpoints.add(addedcheckpoint);
+        if(!checkpoints.contains(addedcheckpoint) && addedcheckpoint==4)
+            checkpoints.add(addedcheckpoint);
     }
 
     public String getName() {
@@ -140,6 +165,9 @@ public class Player extends Subject {
 
         }
     }
+
+
+
 
 
     public CommandCardField getProgramField(int i) {

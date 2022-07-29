@@ -22,6 +22,7 @@
 package dk.dtu.compute.se.pisd.roborally.view;
 
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
+import dk.dtu.compute.se.pisd.roborally.model.Heading;
 import dk.dtu.compute.se.pisd.roborally.model.Player;
 import dk.dtu.compute.se.pisd.roborally.model.Space;
 import javafx.scene.Node;
@@ -364,13 +365,32 @@ public class SpaceView extends StackPane implements ViewObserver {
             }
 
 
+
+
             canvas1.setRotate((90 * player.getHeading().ordinal()) % 360);
             canvas.setRotate((90 * player.getHeading().ordinal()) % 360);
             arc.setRotate((90 * player.getHeading().ordinal()) % 360);
 
-            canvas1.setRotate(90 % 360);
-            canvas.setRotate(90 % 360);
-            arc.setRotate(90 % 360);
+            if(player.getHeading() == Heading.SOUTH){
+                canvas1.setRotate(90 % 360);
+                canvas.setRotate(90 % 360);
+                arc.setRotate(90 % 360);
+            }
+            if(player.getHeading() == Heading.WEST){
+                canvas1.setRotate(180 % 360);
+                canvas.setRotate(180 % 360);
+                arc.setRotate(180 % 360);
+            }
+            if(player.getHeading() == Heading.NORTH){
+                canvas1.setRotate(270 % 360);
+                canvas.setRotate(270 % 360);
+                arc.setRotate(270 % 360);
+            }
+            if(player.getHeading() == Heading.EAST){
+                canvas1.setRotate(0 % 360);
+                canvas.setRotate(0 % 360);
+                arc.setRotate(0 % 360);
+            }
 
             this.getChildren().addAll(arc,canvas,canvas1);
 
@@ -379,7 +399,7 @@ public class SpaceView extends StackPane implements ViewObserver {
     }
     @SneakyThrows
     private void updateCP()  {
-        FileInputStream input = new FileInputStream("C:/Users/Chris/IdeaProjects/projectproject2/src/main/java/dk/dtu/compute/se/pisd/roborally/view/picture/minesweeperflag.png");
+        //FileInputStream input = new FileInputStream("C:/Users/Chris/IdeaProjects/projectproject2/src/main/java/dk/dtu/compute/se/pisd/roborally/view/picture/minesweeperflag.png");
 
 
         if (space.x == 6 && space.y == 4) {

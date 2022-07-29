@@ -28,9 +28,13 @@ import dk.dtu.compute.se.pisd.roborally.model.*;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.System.exit;
 import static java.util.Objects.isNull;
@@ -44,10 +48,15 @@ import static java.util.Objects.isNull;
 public class GameController  {
 
     final public Board board;
+    //public static AppController appController;
+     GameController gameController;
+
+     public RoboRally roboRally;
 
     public GameController(Board board) {
         this.board = board;
     }
+
 
 
 
@@ -367,7 +376,7 @@ public class GameController  {
 
                 //moves the player on target space
                 target.setPlayer(player);
-                Scoring(player, player.getSpace());
+                //Scoring(player, player.getSpace());
 
                 // checks if the space is a gear, and turns head if is.
                 Space Gear_Space = new Space(board,4,5);
@@ -388,6 +397,9 @@ public class GameController  {
                     return;
                 }
 
+                Space endingspace = player.getSpace();
+                Scoring(player,endingspace,board);
+                System.out.println(player.getCheckpoints());
 
 //                while(checkCheckpoint(player.getSpace())) { //checks if there is a checkpoint
 //
@@ -554,32 +566,70 @@ public class GameController  {
         }
     }
 
-    public boolean checkCheckpoint(@NotNull Space space){
-        Space space_66 = new Space(board,6,6);
-        Space space_15 = new Space(board,1,5);
-        Space space_50 = new Space(board,5,0);
-        Space space_43 = new Space(board,4,3);
+    public int checkCheckpoint(@NotNull Space space){
+        Space space_64 = new Space(board,6,4);
+        Space space_04 = new Space(board,0,4);
+        Space space_41 = new Space(board,4,1);
+        Space space_56 = new Space(board,5,6);
 
-        if(toStringCheck(space,space_66)){return true;}
-        if(toStringCheck(space,space_15)){return true;}
-        if(toStringCheck(space,space_50)){return true;}
-        if(toStringCheck(space,space_43)){return true;}
-        return false;
+        if(toStringCheck(space,space_64)){return 3;}
+        if(toStringCheck(space,space_04)){return 2;}
+        if(toStringCheck(space,space_41)){return 4;}
+        if(toStringCheck(space,space_56)){return 1;}
+        return 0;
     }
     // TODO Not working properly
-    public int Scoring(@NotNull Player player, @NotNull Space space) {
-        Space player_space = player.getSpace();
+    @SneakyThrows
+    public void Scoring(@NotNull Player player,
+                        @NotNull Space space, @NotNull Board board) {
+        //gameController = new GameController(board);
+        //roboRally = new RoboRally();
+        //AppController appController = new AppController(roboRally);
 
-        if (checkCheckpoint(player_space)) {
-            int value = space.checkpoint(player_space);
+        player.setCheckpoints(player.getCheckpoints(),checkCheckpoint(space));
 
-            if (player.getProgress() == value - 1) {
-                player.setProgress(value);
-            }
-            //sout to try and see if it even works
-            //System.out.println(player.getProgress());
+        if(player.getCheckpoints().contains(1)&&
+        player.getCheckpoints().contains(2)&&
+        player.getCheckpoints().contains(3)&&
+        player.getCheckpoints().contains(4)
+        ){
+            //roboRally.createBoardView(gameController);
+            AppController appController = new AppController(this.roboRally);
+            //GameController gamecontroller = new GameController(board);
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("WINNER!");
+            alert.setContentText(player.getName().toUpperCase() + " WON THE GAME!! \n --The game will now close.--");
+
+            Optional<ButtonType> result = alert.showAndWait();
+
+            TimeUnit.SECONDS.sleep(2);
+
+            // This is not doing exactly as i want it to, the problem is that it sees roborally as NULL.
+            appController.exit();
+
+
+//
+////            if (!result.isPresent() || result.get() != ButtonType.OK) {
+//                if(result.get() == ButtonType.OK){
+//
+//                    //gameController = this.gameController;
+//                roboRally.createBoardView(gamecontroller);
+//                } else {
+//                return;} // return without exiting the application
+//            }
         }
-        return player.getProgress();
+
+//        if (checkCheckpoint(space)) {
+//            int value = space.checkpoint(player_space);
+//
+//            if (player.getProgress() == value - 1) {
+//                player.setProgress(value);
+//            }
+//
+//            //System.out.println(player.getProgress());
+//        }
+//        return player.getProgress();
 
         //if (player.getProgress() == 4) {
         //    Breaks execution of 'program' sequence
