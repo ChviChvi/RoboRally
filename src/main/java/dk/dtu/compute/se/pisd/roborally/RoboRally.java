@@ -67,7 +67,7 @@ public class RoboRally extends Application {
         Scene primaryScene = new Scene(vbox);
 
         stage.setScene(primaryScene);
-        stage.setTitle("RoboRally");
+        stage.setTitle("ROBORALLY");
         stage.setOnCloseRequest(
                 e -> {
                     e.consume();
@@ -79,7 +79,7 @@ public class RoboRally extends Application {
                         ex.printStackTrace();
                     }
                 } );
-        stage.setResizable(false);
+        stage.setResizable(true);
         stage.sizeToScene();
         stage.show();
     }

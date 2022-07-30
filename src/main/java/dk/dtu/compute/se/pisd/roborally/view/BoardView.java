@@ -58,7 +58,9 @@ public class BoardView extends VBox implements ViewObserver {
 
         mainBoardPane = new GridPane();
         playersView = new PlayersView(gameController);
-        statusLabel = new Label("<no status>");
+        statusLabel = new Label("no status");
+
+        statusLabel.setVisible(true);
 
         this.getChildren().add(mainBoardPane);
         this.getChildren().add(playersView);
@@ -87,6 +89,7 @@ public class BoardView extends VBox implements ViewObserver {
         if (subject == board) {
             Phase phase = board.getPhase();
             statusLabel.setText(board.getStatusMessage());
+
         }
     }
 

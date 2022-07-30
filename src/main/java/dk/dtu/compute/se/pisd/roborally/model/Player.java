@@ -92,6 +92,9 @@ public class Player extends Subject {
             checkpoints.add(addedcheckpoint);
         if(!checkpoints.contains(addedcheckpoint) && addedcheckpoint==4)
             checkpoints.add(addedcheckpoint);
+        //this way this list is never empty :) cheap-.
+        if(!checkpoints.contains(addedcheckpoint) && addedcheckpoint==55)
+            checkpoints.add(addedcheckpoint);
     }
 
     public String getName() {

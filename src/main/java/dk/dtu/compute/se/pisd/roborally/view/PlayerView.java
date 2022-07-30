@@ -128,13 +128,15 @@ public class PlayerView extends Tab implements ViewObserver {
             }
         }
 
-        score = new Text(("Checkpoints reached: " + player.getProgress()));
+        //score = new Text(("Checkpoints reached: " + player.getProgress()));
+        //score = new Text(" ");
+
 
         top.getChildren().add(programLabel);
         top.getChildren().add(programPane);
         top.getChildren().add(cardsLabel);
         top.getChildren().add(cardsPane);
-        top.getChildren().add(score);
+        //top.getChildren().add(score);
 
         if (player.board != null) {
             player.board.attach(this);

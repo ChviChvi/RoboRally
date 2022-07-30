@@ -107,6 +107,20 @@ public class LoadBoard {
 
         return String_program;
     }
+
+    public static String stringcheckpoints(@NotNull Player player){
+
+        ArrayList<Integer> myNumbers = player.getCheckpoints();
+
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < myNumbers.size(); i++)
+        {
+            int myNumbersInt = myNumbers.get(i);
+            str.append(myNumbersInt + ",");
+        }
+        return str.toString();
+    }
+
     public static String stringprogramcards(@NotNull Player player) {
         //List<String> COMMANDCARDLIST = new ArrayList<String>();
         List<String> PROGRAMFIELDLIST = new ArrayList<String>();
@@ -201,6 +215,7 @@ public class LoadBoard {
             JSONArray PlayerList = jsonObject.getJSONObject("gamestate").getJSONArray("players");
             JSONArray CardList = jsonObject.getJSONObject("gamestate").getJSONArray("cards");
 
+
             for (int i = 0, size = PlayerList.length(); i < size; i++) {
                 JSONObject objectInArray = (JSONObject) PlayerList.get(i);
                 String player_name = objectInArray.get("name").toString();
@@ -223,6 +238,9 @@ public class LoadBoard {
 
             }
 
+
+
+
             for (int i = 0, size = CardList.length(); i < size; i++) {
                 JSONObject objectInArray = (JSONObject) CardList.get(i);
                 String player_names = objectInArray.get("name").toString();
@@ -235,16 +253,28 @@ public class LoadBoard {
                     program_names = program_names.replace("U:T", "U-T");
                 }
 
+                //if(!isNull(objectInArray.get("checkpoints").toString())){
+
+
+                System.out.println("----------------");
+                //System.out.println(Checkpoint_points);
+                System.out.println("----------------");
+
+
                 // put these two strings in two different arrays, and then through a forloop set cards :) DONE :D
 
                 String strC[] = command_names.split(",");
                 String strP[] = program_names.split(",");
 
+                //String checkP[] = Checkpoint_points.split(",");
+
                 List<String> listC = new ArrayList<String>();
                 List<String> listP = new ArrayList<String>();
+                //List<String> ListCP = new ArrayList<>();
 
                 listC = Arrays.asList(strC);
                 listP = Arrays.asList(strP);
+                //ListCP = Arrays.asList(checkP);
 
                 System.out.println("LISTC");
                 for(String c: listC){
@@ -252,6 +282,17 @@ public class LoadBoard {
                 }
                 System.out.println("LISTP");
                 for(String c: listP){
+                    System.out.println(c);
+                }
+
+                String Checkpoint_points = objectInArray.get("checkpoints").toString();
+                System.out.println("///////////////////////////////////////////////////");
+                System.out.println(Checkpoint_points);
+                String checkP[] = Checkpoint_points.split(",");
+                List<String> ListCP = new ArrayList<>();
+                ListCP = Arrays.asList(checkP);
+                System.out.println("LISTCP");
+                for(String c: ListCP) {
                     System.out.println(c);
                 }
 
@@ -290,6 +331,21 @@ public class LoadBoard {
                         //    System.out.println("this is working!!!");
                         //}
                     }
+
+                    //if(!isNull(objectInArray.get("checkpoints").toString())) {
+
+
+                        //if (!isNull(ListCP.size())) {
+                            for (int k = 0; k < ListCP.size(); k++) {
+                                if (!isNull(ListCP.get(k)) || !ListCP.get(k).equals("")) {
+                                    if(Integer.parseInt(ListCP.get(k)) == 55)
+                                    {} else {
+                                        player.setCheckpoints(player.getCheckpoints(), Integer.parseInt(ListCP.get(k)));
+                                    }
+                                }
+                            }
+                        //}
+                    //}
                 }
 
 
@@ -547,8 +603,7 @@ public class LoadBoard {
         return HEY;
     }
 
-    public static void downloadFile(URL url, String outputFileName) throws IOException
-    {
+    public static void downloadFile(URL url, String outputFileName) throws IOException {
         try (InputStream in = url.openStream();
              ReadableByteChannel rbc = Channels.newChannel(in);
              FileOutputStream fos = new FileOutputStream(outputFileName)) {
@@ -563,6 +618,7 @@ public class LoadBoard {
         template.height = board.height;
 
         List<String> playerscards = new ArrayList<String>();
+        List<Integer> playerscheckpoints = new ArrayList<>();
 
         for (int i = 0; i < board.getPlayersNumber(); i++) {
             System.out.println("Cards for player "+ i);
@@ -570,11 +626,18 @@ public class LoadBoard {
             if (player != null) {
                 String command_cards = stringcommandcards(player);
 
+                player.setCheckpoints(player.getCheckpoints(),55);
+                String checkpoints_string = stringcheckpoints(player);
                 String program_cards = stringprogramcards(player);
                 System.out.println(command_cards);
                 System.out.println(program_cards);
+                System.out.println(checkpoints_string);
 
-                String jsoncards = "{\"name\":\"Player "+i+"\",\"commandcards\":\""+command_cards+"\",\"programcards\":\""+program_cards+"\"}";
+                String jsoncards = "{\"name\":\"Player "+i+"\"," +
+                        "\"commandcards\":\""+command_cards+"\"," +
+                        "\"programcards\":\""+program_cards+"\"," +
+                        "\"checkpoints\":\""+checkpoints_string+"\""+
+                        "}";
                 playerscards.add(jsoncards);
 //
 //                for (int j = 0; j < Player.NO_REGISTERS; j++) {

@@ -54,7 +54,6 @@ public class AppController {
                 player.setSpace(board.getSpace(i % board.width, i));
             }
 
-            // XXX: V2
             // board.setCurrentPlayer(board.getPlayer(0));
             gameController.startProgrammingPhase();
 
@@ -63,7 +62,6 @@ public class AppController {
     }
 
     public void saveGame() throws IOException, InterruptedException {
-        // XXX needs to be implemented eventually
         LoadBoard.saveBoard(gameController.board,"SavedGame");
     }
 
@@ -72,9 +70,6 @@ public class AppController {
         dialog.setTitle("Saved Games");
         dialog.setHeaderText("Select which game to load");
         Optional<Integer> result = dialog.showAndWait();
-
-        // XXX needs to be implememted eventually
-        // for now, we just create a new game
         gameController = new GameController(LoadBoard.loadBoard(result)); //here you would have to put result
         //gameController.startProgrammingPhase();
         roboRally.createBoardView(gameController);
@@ -120,29 +115,6 @@ public class AppController {
         if (gameController == null || stopGame()) {
             Platform.exit();
         }
-    }
-
-    public void gameisdone(String playernumber) throws IOException, InterruptedException {
-
-
-
-        //if (gameController != null) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Exit RoboRally?");
-            alert.setContentText("Are you sure you want to exit RoboRally?");
-            Optional<ButtonType> result = alert.showAndWait();
-
-            if (!result.isPresent() || result.get() != ButtonType.OK) {
-                //if(result.get() == ButtonType.OK){
-                this.roboRally.createBoardView(null);
-               // }
-                return; // return without exiting the application
-            }
-       // }
-
-        // If the user did not cancel, the RoboRally application will exit
-        // after the option to save the game
-
     }
 
     public boolean isGameRunning() {
