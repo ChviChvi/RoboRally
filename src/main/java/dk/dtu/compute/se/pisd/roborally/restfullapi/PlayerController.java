@@ -21,21 +21,11 @@ public class PlayerController {
         this.playerService = playerService;
     }
 
-//    @PostMapping
-//    public void registernewPlayer(@RequestBody Player player){
-//        playerService.addNewPlayer(player);
-//    }
-
     @PostMapping()
     public ResponseEntity<Board> savePlayer(@RequestBody Board player){
 
         return new ResponseEntity<Board>((Board) playerService.savePlayer(player), HttpStatus.CREATED);
     }
-
-//    @GetMapping("/{id}")
-//    public Board read(@PathVariable Long id){
-//        return playerService.findAllbyID(id);
-//    }
 
     @DeleteMapping(path = "{boardid}")
     public void deletePlayer(@PathVariable("boardid") Long playerId) {
@@ -52,68 +42,4 @@ public class PlayerController {
     public List<Board> getAllBoards(){
         return playerService.getBoards();
     }
-//    @PostMapping
-//    public void registernewPlayers(@RequestBody List<Player> player){
-//        playerService.save(player);
-//    }
-//
-//    @GetMapping("/list")
-//    public Iterable<Board> list() {
-//        return playerService.list();
-//    }
-
-// LIST YOU NEED LISTS
-
-//    @GetMapping
-//    public PlayerRepository getPlayers() {
-//        return playerService.getPlayers();
-//    }
-
-//    @PostMapping
-//    public void registerNewBoard(@RequestBody Player player){
-//        playerService.addNewPlayer(player);
-//    }
-
-
-    //    @GetMapping("/list")
-//    public Iterable<Player> list(){
-//        return playerService.list();
-//    }
-
-//    @PostMapping()
-//    public ResponseEntity<Player> savePlayer(@RequestBody Player player){
-//        return new ResponseEntity<Player>((Player) playerService.savePlayer(player), HttpStatus.CREATED);
-//    }
-//
-//    // build get all players RESTAPI
-//    @GetMapping
-//    public List<Player> getAllPlayers(){
-//        return playerService.getAllPlayers();
-//    }
-//
-//    // build get employee by id REST API
-//    // http://localhost:8080/api/players/1
-//    @GetMapping("{id}")
-//    public ResponseEntity<Player> getPlayerById(@PathVariable("id") long playerId){
-//        return new ResponseEntity<Player>(playerService.getPlayerById(playerId), HttpStatus.OK);
-//    }
-//
-//    //build update player REST API
-//    // http://localhost:8080/api/players/1
-//    @PutMapping("{id}")
-//    public ResponseEntity<Player> updatePlayer(@PathVariable("id") long id
-//                                              , @RequestBody Player player){
-//        return new ResponseEntity<Player>(playerService.updatePlayer(player, id), HttpStatus.OK);
-//    }
-//
-//    //build delete player REST API
-//    @DeleteMapping("{id}")
-//    public ResponseEntity<String> deletePlayer(@PathVariable("id")long id){
-//
-//        //Deletes the player
-//        playerService.deletePlayer(id);
-//
-//        return new ResponseEntity<String>("Player deleltion succes!", HttpStatus.OK);
-//
-//    }
 }

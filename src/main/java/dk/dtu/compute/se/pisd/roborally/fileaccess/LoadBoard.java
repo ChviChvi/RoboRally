@@ -65,19 +65,16 @@ import static java.util.Objects.isNull;
  */
 public class LoadBoard {
 
+    private static final HttpClient httpClient = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_2)
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
+
     private static final String BOARDSFOLDER = "boards";
     private static final String DEFAULTBOARD = "defaultboard1";
-    //private static final String JSON_EXT = "json";
     public static GameController gameController;
     public static RoboRally roboRally;
 
-    private Player player;
-    private static CommandCard card;
-    private Command command;
-    private CommandCardField commandCardField;
-
-
-    //CommandCardField cardField;
     String cardField;
 
     @Override
@@ -86,10 +83,10 @@ public class LoadBoard {
                 "cardField=" + cardField +
                 '}';
     }
+
+    //takes all commandcards from player and creates a string out of it
     public static String stringcommandcards(@NotNull Player player) {
         List<String> COMMANDCARDLIST = new ArrayList<String>();
-
-        //System.out.println("Command Cards");
         for (int i = 0; i < 8; i++) {
             if(isNull(player.getCardField(i).getCard())){
                 COMMANDCARDLIST.add("EMPTY");
@@ -98,18 +95,12 @@ public class LoadBoard {
                 COMMANDCARDLIST.add(cardcards);
             }
         }
-
         String String_program = String.join(",",COMMANDCARDLIST);
-
-//        for ( String elem : COMMANDCARDLIST ) {
-//            System.out.println("PROGRAMCARD : "+elem);
-//        }
-
         return String_program;
     }
 
+    //takes player checpoints and make string
     public static String stringcheckpoints(@NotNull Player player){
-
         ArrayList<Integer> myNumbers = player.getCheckpoints();
 
         StringBuilder str = new StringBuilder();
@@ -121,61 +112,58 @@ public class LoadBoard {
         return str.toString();
     }
 
+    //takes all programcards afrom player and creates a string out of it
     public static String stringprogramcards(@NotNull Player player) {
-        //List<String> COMMANDCARDLIST = new ArrayList<String>();
         List<String> PROGRAMFIELDLIST = new ArrayList<String>();
 
-
-        //System.out.println("Program Cards");
         for (int i = 0; i < 5; i++) {
-            //System.out.println(Player.getProgramField(i).getCard());
             if(isNull(player.getProgramField(i).getCard())){
                 PROGRAMFIELDLIST.add("EMPTY");
             } else {
-                //String cardField = player.getProgramField(i).getCard().getName();
                 String programcards = player.getProgramField(i).getCard().getName();
                 PROGRAMFIELDLIST.add(programcards);
             }
         }
-        //System.out.println("Command Cards");
-//        for (int i = 0; i < 8; i++) {
-//            if(isNull(player.getCardField(i).getCard())){
-//                COMMANDCARDLIST.add("EMPTY");
-//            } else {
-//                String cardcards = player.getCardField(i).getCard().getName();
-//                COMMANDCARDLIST.add(cardcards);
-//            }
-//        }
-
-//        String String_program = String.join(",",COMMANDCARDLIST);
         String String_card = String.join(",",PROGRAMFIELDLIST);
-
-//        for ( String elem : COMMANDCARDLIST ) {
-//            System.out.println("PROGRAMCARD : "+elem);
-//        }
-//        for ( String elem : PROGRAMFIELDLIST ) {
-//            System.out.println("COMMANDCARD : "+elem);
-//        }
         return String_card;
     }
 
-    private static final HttpClient httpClient = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_2)
-            .connectTimeout(Duration.ofSeconds(10))
-            .build();
-
-
+   //THIS METHOD LOADS NUMMERIC NUMBERS FROM DATABASE
     public static List<Integer> getAllSaves(){
         //httpDEL(1030);
         List<Integer> result = new ArrayList<Integer>();
 
+        int nosave = 0;
         /** this value might need to be changed on other pc.*/
-        for(int i=999;i<1100; i++){
+        for(int i=0;i<5000; i++){
             String test = httpGETbyID(i);
             //System.out.println(test);
             if( !test.contains("null") && test.length() != 4){
                 result.add(i);
+                nosave=0;
+            } else{
+                nosave++;
             }
+            if(nosave==25){
+                if(i<=1000){
+                    i =1000;
+                }
+                if(i<=2000 && i >1001){
+                    i =2000;
+                }
+                if(i<=3000 && i >2001){
+                    i =3000;
+                }
+                if(i<=4000 && i >3001){
+                    i =4000;
+                }
+                if(i<=5000 && i >4001){
+                    i =5000;
+                }
+                nosave = 0;
+            }
+            //some loops to fix this bad method kinda ..
+
         }
         //System.out.println(result);
         return result;
@@ -195,7 +183,6 @@ public class LoadBoard {
         //httpDEL(1034);
 
         int boardsave = boardname.get();
-        //System.out.println(boardsave + " this was the value you chosE?");
 
         //String allSaves = httpGET();
         String allSaves = httpGETbyID(boardsave);
@@ -203,18 +190,14 @@ public class LoadBoard {
 
         allSaves = Decoding(allSaves);
 
-        System.out.println(allSaves);
-
-
+        //System.out.println(allSaves);
 
         System.out.println("--------- THE GAME "+ boardsave +" IS LOADED---------");
-
 
         try{
             JSONObject jsonObject = new JSONObject(allSaves);
             JSONArray PlayerList = jsonObject.getJSONObject("gamestate").getJSONArray("players");
             JSONArray CardList = jsonObject.getJSONObject("gamestate").getJSONArray("cards");
-
 
             for (int i = 0, size = PlayerList.length(); i < size; i++) {
                 JSONObject objectInArray = (JSONObject) PlayerList.get(i);
@@ -234,12 +217,7 @@ public class LoadBoard {
                 if(player_heading.equals("WEST")){player.setHeading(Heading.WEST);}
                 if(player_heading.equals("EAST")){player.setHeading(Heading.EAST);}
                 if(player_heading.equals("SOUTH")){player.setHeading(Heading.SOUTH);}
-
-
             }
-
-
-
 
             for (int i = 0, size = CardList.length(); i < size; i++) {
                 JSONObject objectInArray = (JSONObject) CardList.get(i);
@@ -253,21 +231,10 @@ public class LoadBoard {
                     program_names = program_names.replace("U:T", "U-T");
                 }
 
-                //if(!isNull(objectInArray.get("checkpoints").toString())){
-
-
-                System.out.println("----------------");
-                //System.out.println(Checkpoint_points);
-                System.out.println("----------------");
-
-
                 // put these two strings in two different arrays, and then through a forloop set cards :) DONE :D
-
                 String strC[] = command_names.split(",");
                 String strP[] = program_names.split(",");
-
                 //String checkP[] = Checkpoint_points.split(",");
-
                 List<String> listC = new ArrayList<String>();
                 List<String> listP = new ArrayList<String>();
                 //List<String> ListCP = new ArrayList<>();
@@ -276,25 +243,25 @@ public class LoadBoard {
                 listP = Arrays.asList(strP);
                 //ListCP = Arrays.asList(checkP);
 
-                System.out.println("LISTC");
-                for(String c: listC){
-                    System.out.println(c);
-                }
-                System.out.println("LISTP");
-                for(String c: listP){
-                    System.out.println(c);
-                }
+//                System.out.println("LISTC");
+//                for(String c: listC){
+//                    System.out.println(c);
+//                }
+//                System.out.println("LISTP");
+//                for(String c: listP){
+//                    System.out.println(c);
+//                }
 
                 String Checkpoint_points = objectInArray.get("checkpoints").toString();
-                System.out.println("///////////////////////////////////////////////////");
-                System.out.println(Checkpoint_points);
+                //System.out.println("///////////////////////////////////////////////////");
+                //System.out.println(Checkpoint_points);
                 String checkP[] = Checkpoint_points.split(",");
                 List<String> ListCP = new ArrayList<>();
                 ListCP = Arrays.asList(checkP);
-                System.out.println("LISTCP");
-                for(String c: ListCP) {
-                    System.out.println(c);
-                }
+                //System.out.println("LISTCP");
+                //for(String c: ListCP) {
+                //    System.out.println(c);
+                //}
 
                 //board.setPhase(Phase.PROGRAMMING);
                 //board.setCurrentPlayer(board.getPlayer(0));
@@ -304,7 +271,6 @@ public class LoadBoard {
                 board.setCurrentPlayer(player);
                 if (player != null) {
                     for (int j = 0; j < Player.NO_CARDS; j++) {
-                        //System.out.println("this happened(111111111)");
                         CommandCardField field = player.getCardField(j);
                         String cardfromlist = listC.get(j);
                         if(isNull(checkCard(cardfromlist))){
@@ -313,10 +279,6 @@ public class LoadBoard {
                             field.setCard(new CommandCard(checkCard(cardfromlist)));
                         }
                         field.setVisible(true);
-                        //System.out.println(player.getCardField(1).getCard().getName());
-                        //if(isNull(player.getCardField(j).getCard())){
-                        //    System.out.println("this is working!!!");}
-
                     }
                     for (int j = 0; j < Player.NO_REGISTERS; j++) {
                         CommandCardField field = player.getProgramField(j);
@@ -327,15 +289,7 @@ public class LoadBoard {
                             field.setCard(new CommandCard(checkCard(cardfromlist)));
                         }
                         field.setVisible(true);
-                        //if(isNull(player.getCardField(1))){
-                        //    System.out.println("this is working!!!");
-                        //}
                     }
-
-                    //if(!isNull(objectInArray.get("checkpoints").toString())) {
-
-
-                        //if (!isNull(ListCP.size())) {
                             for (int k = 0; k < ListCP.size(); k++) {
                                 if (!isNull(ListCP.get(k)) || !ListCP.get(k).equals("")) {
                                     if(Integer.parseInt(ListCP.get(k)) == 55)
@@ -344,166 +298,18 @@ public class LoadBoard {
                                     }
                                 }
                             }
-                        //}
-                    //}
                 }
 
-
-
-                ///////for(int j = 0; j < listC.size(); j++) {
-                ///////    player.getCardField(j).setCard(null);
-                ///////    player.getCardField(j).setVisible(true);
-                    //CommandCardField field1 = new CommandCardField(player);
-                    //field1.setCard(null);
-
-
-
-
-                    //CommandCardField fields = new CommandCardField(player);
-                    //CommandCardField field = player.getCardField(j);
-                    //veltje.
-                    //fields.setCard(card(FORWARD));
-
-                    //field.setCard(null);
-                    //field.setVisible(true);
-//                    if (listC.get(j).contains("EMPTY")) {
-//                        field.setCard(null);
-//                        field.setVisible(true);
-//                    } else {
-//                        field.setCard(new CommandCard(Command.FORWARD));
-//                    }
-                ///////}
-                //Player player = board.getPlayer(i);
-                ///////for(int j = 0; j < listP.size(); j++) {
-                ///////    player.getProgramField(j).setCard(null);
-                ///////    player.getProgramField(j).setVisible(true);
-                    //CommandCardField field = new CommandCardField(player);
-                    //CommandCardField field = player.getProgramField(j);
-                    //veltje.
-                    //field.setCard(new CommandCard(FORWARD));
-                    //field.setVisible(true);
-//                    if (listC.get(j).contains("EMPTY")) {
-//                        field.setCard(null);
-//                        field.setVisible(true);
-//                    } else {
-//                        field.setCard(new CommandCard(Command.FORWARD));
-//                    }
-                ///////}
-
-
-                System.out.println(toString(player));
-                System.out.println(command_names);
-                System.out.println(program_names);
-                //Player player = board.getPlayer(i);
-
-
-                //card_names = card_names.replace()
-
-//                for (int j = 0; j < Player.NO_REGISTERS; j++) {
-//                    CommandCardField field = player.getProgramField(j);
-//                    field.setCard(null);
-//                    field.setVisible(true);
-//                }
-//                for (int j = 0; j < Player.NO_CARDS; j++) {
-//                    CommandCardField field = player.getCardField(j);
-//                    field.setCard(generateRandomCommandCard());
-//                    field.setVisible(true);
-//                }
+                //System.out.println(toString(player));
+                //System.out.println(command_names);
+                //System.out.println(program_names);
             }
-
-//                "name": "Player 1",
-//                        "color": "green",
-//                        "x": 0,
-//                        "y": 0,
-//                        "heading": "SOUTH"
-
-                // "...and get thier component and thier value."
-//                String[] elementNames = JSONObject.g(objectInArray);
-//                System.out.printf("%d ELEMENTS IN CURRENT OBJECT:\n", elementNames.length);
-//                for (String elementName : elementNames) {
-//                    String value = objectInArray.getString(elementName);
-//                    System.out.printf("name=%s, value=%s\n", elementName, value);
-//                }
-//                System.out.println();
-//            }
-
-//            System.out.println(PlayerList);
-//            Iterator<JSONObject> iterator = PlayerList.iterator();
-//            int player = 0;
-//            while (iterator.hasNext()) {
-//                System.out.println(iterator.next());
-//        }
-
 
             return board;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-
-
-
-        //gameController.startProgrammingPhase();
-
-        //roboRally.createBoardView(gameController);
-
-
-
-
-///////////////////////////////////////////////////////
-//        if (boardname == null) {
-//            boardname = DEFAULTBOARD;
-//        }
-//
-//        ClassLoader classLoader = LoadBoard.class.getClassLoader();
-//        InputStream inputStream = classLoader.getResourceAsStream("src/main/resources/" + BOARDSFOLDER + "/" + boardname + "/SavedGame1/" + JSON_EXT);
-//        System.out.println(inputStream);
-//
-////        if (inputStream == null) {
-////            // TODO these constants should be defined somewhere
-////            return new Board(8,8);
-////        }
-//        System.out.println("you got here3");
-//        // In simple cases, we can create a Gson object with new Gson():
-//        GsonBuilder simpleBuilder = new GsonBuilder().
-//                registerTypeAdapter(FieldAction.class, new Adapter<FieldAction>());
-//        Gson gson = simpleBuilder.create();
-//
-//        Board result;
-//        FileReader fileReader = null;
-//        JsonReader reader = null;
-//
-//        try {
-//
-//            fileReader = new FileReader("src/main/resources/boards/SavedGame1.json");
-//            System.out.println(fileReader);
-//            reader = gson.newJsonReader(new FileReader(String.valueOf(fileReader)));
-//
-//            BoardTemplate template = gson.fromJson(reader, BoardTemplate.class);
-//
-//            result = new Board(template.width, template.height);
-//            for (SpaceTemplate spaceTemplate: template.spaces) {
-//                Space space = result.getSpace(spaceTemplate.x, spaceTemplate.y);
-//                if (space != null) {
-//                    space.getActions().addAll(spaceTemplate.actions);
-//                    space.getWalls().addAll(spaceTemplate.walls);
-//                }
-//            }
-//            reader.close();
-//            return result;
-//        } catch (IOException e1) {
-//            if (reader != null) {
-//                try {
-//                    reader.close();
-//                    inputStream = null;
-//                } catch (IOException e2) {}
-//            }
-//            if (inputStream != null) {
-//                try {
-//                    inputStream.close();
-//                } catch (IOException e2) {}
-//            }
-//        }
         return null;
     }
 
@@ -514,7 +320,7 @@ public class LoadBoard {
     public static final String POST_API_URL = "http://localhost:8080/upload";
     public static final String GET_API_URL = "http://localhost:8080/api/v1/players/list";
 
-
+    //method for deleting
     public static void httpDEL(int id) {
         try{
             HttpRequest request = HttpRequest.newBuilder()
@@ -530,6 +336,7 @@ public class LoadBoard {
 
         }
     }
+
     @SneakyThrows
     public static String httpGETbyID(int id) {
         try{
@@ -584,8 +391,6 @@ public class LoadBoard {
 
         String body = response.body();
         JSONArray bodyarray = new JSONArray();
-
-
         //JSONObject jsonObject = body;
         //System.out.println(response.body());
 
@@ -621,7 +426,7 @@ public class LoadBoard {
         List<Integer> playerscheckpoints = new ArrayList<>();
 
         for (int i = 0; i < board.getPlayersNumber(); i++) {
-            System.out.println("Cards for player "+ i);
+            //System.out.println("Cards for player "+ i);
             Player player = board.getPlayer(i);
             if (player != null) {
                 String command_cards = stringcommandcards(player);
@@ -629,9 +434,9 @@ public class LoadBoard {
                 player.setCheckpoints(player.getCheckpoints(),55);
                 String checkpoints_string = stringcheckpoints(player);
                 String program_cards = stringprogramcards(player);
-                System.out.println(command_cards);
-                System.out.println(program_cards);
-                System.out.println(checkpoints_string);
+                //System.out.println(command_cards);
+                //System.out.println(program_cards);
+                //System.out.println(checkpoints_string);
 
                 String jsoncards = "{\"name\":\"Player "+i+"\"," +
                         "\"commandcards\":\""+command_cards+"\"," +
@@ -639,20 +444,11 @@ public class LoadBoard {
                         "\"checkpoints\":\""+checkpoints_string+"\""+
                         "}";
                 playerscards.add(jsoncards);
-//
-//                for (int j = 0; j < Player.NO_REGISTERS; j++) {
-//
-//                }
-//                for (int j = 0; j < Player.NO_CARDS; j++) {
-//                    CommandCardField field = player.getCardField(j);
-//                    field.setCard(generateRandomCommandCard());
-//                    field.setVisible(true);
-//                }
             }
         }
 
         String playercardsjson = String.join(",",playerscards);
-        System.out.println("check of dit goed is" + playercardsjson);
+        //System.out.println("check of dit goed is" + playercardsjson);
         //hell(gameController.board.getPlayer(i));
 
         for (int i=0; i<board.width; i++) {
@@ -705,25 +501,21 @@ public class LoadBoard {
 
         String json_save = gson.toJson(template, template.getClass());
         //String save = gson.toJson(template, template.getClass());
-        System.out.println(json_save);
+        //System.out.println(json_save);
 
 
         if (json_save.contains("\"}]}")) {
             json_save = json_save.replace("\"}]}", "\"}],\"cards\":["+ playercardsjson +"]}");
 
         }
-        System.out.println(json_save);
-        json_save = Encoding(json_save);
         //System.out.println(json_save);
-        //System.out.println("----------- WE GOT HERE (1) ----------------");
+        json_save = Encoding(json_save);
 
-
-//////////////////////////////////////////////////////////////////////////////////////////
         try{
             String testest = "{\"gamestate\":\""+json_save+"\"}";
             //String testest = "{\"gamestate\":\""+json_save+","+ "\"}";
             //String productJSON = new Gson().toJson(testest);
-            System.out.println(testest);
+            //System.out.println(testest);
             HttpRequest request = HttpRequest.newBuilder()
                     .POST(HttpRequest.BodyPublishers.ofString(testest))
                     .uri(URI.create("http://localhost:8080/api/v1/players"))
@@ -747,7 +539,6 @@ public class LoadBoard {
             System.out.println(e);
         }
         System.out.println("--------- THE GAME IS SAVED ---------");
-        /////////////////////////////
 //            try {
 //                URL url = new URL("http://localhost:8080/players");
 //                String postData = "gamestate"+":"+json_save;
@@ -807,131 +598,7 @@ public class LoadBoard {
 //                System.out.println(e);
 //            }
 
-
-///////////////////////////////////
-//            File file = new File(filepath);
-//            URL url = new URL("http://localhost:8080/upload");
-//            urlconnection = url.openConnection();
-//            urlconnection.setDoOutput(true);
-//            urlconnection.setDoInput(true);
-//System.out.println("----------- WE GOT HERE (2) ----------------");
-//            if (urlconnection instanceof HttpURLConnection) {
-//                ((HttpURLConnection) urlconnection).setRequestMethod("POST");
-//                ((HttpURLConnection) urlconnection).setRequestProperty("Content-type", "text/json");
-//                ((HttpURLConnection) urlconnection).connect();
-//            }
-//            BufferedOutputStream bos = new BufferedOutputStream(urlconnection.getOutputStream());
-//            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-//            int i;
-//            // read byte by byte until end of stream
-//            while ((i = bis.read()) > 0) {
-//                bos.write(i);
-//            }
-//            bis.close();
-//            bos.close();
-//            System.out.println(((HttpURLConnection) urlconnection).getResponseMessage());
-//            try {
-//System.out.println("----------- WE GOT HERE (3) ----------------");
-//                InputStream inputStream;
-//                int responseCode = ((HttpURLConnection) urlconnection).getResponseCode();
-//                if ((responseCode >= 200) && (responseCode <= 202)) {
-//                    inputStream = ((HttpURLConnection) urlconnection).getInputStream();
-//                    int j;
-//                    while ((j = inputStream.read()) > 0) {
-//                        System.out.println(j);
-//                    }
-//System.out.println("----------- WE GOT HERE (4) ----------------");
-//                } else {
-//                    inputStream = ((HttpURLConnection) urlconnection).getErrorStream();
-//                }
-//System.out.println("----------- WE GOT HERE (5) ----------------");
-//                ((HttpURLConnection) urlconnection).disconnect();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-
-////////////////////////////////////
-
-
-        //httpGET();
-
-
-
-
-
-
-//
-//        ClassLoader classLoader = LoadBoard.class.getClassLoader();
-//        // TODO: this is not very defensive, and will result in a NullPointerException
-//        //       when the folder "resources" does not exist! But, it does not need
-//        //       the file "simpleCards.json" to exist!
-//        String filename =
-//                classLoader.getResource(BOARDSFOLDER).getPath() + "/" + name + "." + JSON_EXT;
-//
-//
-//        // In simple cases, we can create a Gson object with new:
-//        //
-//        // Gson gson = new Gson();
-//        //
-//        // But, if you need to configure it, it is better to create it from
-//        // a builder (here, we want to configure the JSON serialisation with
-//        // a pretty printer):
-//        GsonBuilder simpleBuilder = new GsonBuilder().
-//                registerTypeAdapter(FieldAction.class, new Adapter<FieldAction>()).
-//                registerTypeAdapter(PlayerTemplate.class, new Adapter<PlayerTemplate>()).
-//                setPrettyPrinting();
-//        Gson gson = simpleBuilder.create();
-//
-//
-//        try {
-//            System.out.println("you got here");
-//            String thisJson = gson.toJson(template, template.getClass());
-//
-//            System.out.println(thisJson);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
-//
-//
-//
-//        FileWriter fileWriter = null;
-//        JsonWriter writer = null;
-//        try {
-//            File file = new File("C:\\Users\\Christiaan Vink\\IdeaProjects\\ADV.Prog_G06new\\src\\main\\resources\\boards\\thisisatest1.json");
-//
-//            //file.createNewFile();
-//            //Path path = Paths.get("C:\\Users\\Christiaan Vink\\IdeaProjects\\ADV.Prog_G06new\\src\\main\\resources\\boards\\thisisatest1.json");
-////            String thisJson = gson.toJson(template, template.getClass());
-////            System.out.println(thisJson);
-//            //Files.writeString(path,thisJson, StandardCharsets.UTF_8);
-//
-//            fileWriter = new FileWriter(file);
-//            writer = gson.newJsonWriter(fileWriter);
-//            String thisJson = gson.toJson(template, template.getClass());
-//            System.out.println(thisJson);
-//            System.out.println("we got here 1");
-//            //writer.close();
-//            System.out.println("we got here 2");
-
-
-//        } catch (IOException e1) {
-//            e1.printStackTrace();
-//            if (writer != null) {
-//                try {
-//                    writer.close();
-//                    fileWriter = null;
-//                } catch (IOException e2) {}
-//            }
-//            if (fileWriter != null) {
-//                try {
-//                    fileWriter.close();
-//                } catch (IOException e2) {}
-//            }
-//        }
     }
-
-//
 
     public static String Encoding(String json_save){
         if(json_save.contains("\"")) {

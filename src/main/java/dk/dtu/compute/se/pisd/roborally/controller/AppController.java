@@ -15,6 +15,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static java.lang.Thread.currentThread;
+import static java.util.Objects.isNull;
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 public class AppController {
 
     final List<Integer> PLAYER_NUMBER_OPTIONS = Arrays.asList(2, 3, 4, 5, 6);
@@ -43,8 +47,6 @@ public class AppController {
                 }
             }
 
-            // XXX the board should eventually be created programmatically or loaded from a file
-            //     here we just create an empty board with the required number of players.
             Board board = new Board(8,8);
             gameController = new GameController(board);
             int no = result.get();
@@ -66,13 +68,28 @@ public class AppController {
     }
 
     public void loadGame() {
-        ChoiceDialog<Integer> dialog = new ChoiceDialog<>(LoadBoard.getAllSaves().get(0), LoadBoard.getAllSaves());
-        dialog.setTitle("Saved Games");
-        dialog.setHeaderText("Select which game to load");
-        Optional<Integer> result = dialog.showAndWait();
-        gameController = new GameController(LoadBoard.loadBoard(result)); //here you would have to put result
-        //gameController.startProgrammingPhase();
-        roboRally.createBoardView(gameController);
+        //IF THERE IS NO SAVES THIS WILL APPEAR
+        if(!isEmpty(LoadBoard.getAllSaves())) {
+            //System.out.println(LoadBoard.getAllSaves());
+            ChoiceDialog<Integer> dialog = new ChoiceDialog<>(LoadBoard.getAllSaves().get(0), LoadBoard.getAllSaves());
+                dialog.setTitle("Saved Games");
+                dialog.setHeaderText("Select which game to load");
+            Optional<Integer> result = dialog.showAndWait();
+            gameController = new GameController(LoadBoard.loadBoard(result)); //here you would have to put result
+            //gameController.startProgrammingPhase();
+            roboRally.createBoardView(gameController);
+        } else {
+            if (1==1) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Saved Games");
+                alert.setContentText("You have no saved games in the database, \nIt could also be that the method LoadBoard.getAllSaves()\n is not iterating over the correct ID");
+                Optional<ButtonType> result = alert.showAndWait();
+
+                if (!result.isPresent() || result.get() != ButtonType.OK) {
+                    return; // return without exiting the application
+                }
+            }
+        }
     }
 
     /**
@@ -114,6 +131,8 @@ public class AppController {
         // after the option to save the game
         if (gameController == null || stopGame()) {
             Platform.exit();
+            System.out.println("- - - - - - - The Game and Database are now shut down. - - - - - - -");
+            System.exit(0);
         }
     }
 

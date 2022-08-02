@@ -169,10 +169,6 @@ public class Player extends Subject {
         }
     }
 
-
-
-
-
     public CommandCardField getProgramField(int i) {
         return program[i];
     }

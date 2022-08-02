@@ -54,7 +54,7 @@ public class GameController  {
         this.board = board;
     }
 
-//moves the current player and switches to the next player after this move.
+    //moves the current player and switches to the next player after this move.
     public void moveCurrentPlayerToSpace(@NotNull Space space) {
         Player player = board.getCurrentPlayer();
         if (space.getPlayer() == null) {
@@ -63,7 +63,7 @@ public class GameController  {
         }
     }
 
-//hands out cards to the players.
+    //hands out cards to the players.
     public void startProgrammingPhase() {
         board.setPhase(Phase.PROGRAMMING);
         board.setCurrentPlayer(board.getPlayer(0));
@@ -86,7 +86,8 @@ public class GameController  {
             }
         }
     }
-//instead of giving a complete set of new cards, only the empty space will be replaced with a new card.
+
+    //instead of giving a complete set of new cards, only the empty space will be replaced with a new card.
     public void LoadCards() {
         board.setPhase(Phase.PROGRAMMING);
         board.setCurrentPlayer(board.getPlayer(0));
@@ -113,7 +114,6 @@ public class GameController  {
         }
     }
 
-
     // random card is generated here
     private CommandCard generateRandomCommandCard() {
         Command[] commands = Command.values();
@@ -138,6 +138,7 @@ public class GameController  {
             }
         }
     }
+
     //this is we iniate everytime a new card is loaded..
     private void makeProgramFieldsInvisible() {
         for (int i = 0; i < board.getPlayersNumber(); i++) {
@@ -208,14 +209,9 @@ public class GameController  {
         }
     }
 
-
-
-    // XXX: V2
+    //simplistic way of executing the cards
     private void executeCommand(@NotNull Player player, Command command) {
         if (player != null && player.board == board && command != null) {
-            // XXX This is a very simplistic way of dealing with some basic cards and
-            //     their execution. This should eventually be done in a more elegant way
-            //     (this concerns the way cards are modelled as well as the way they are executed).
 
             switch (command) {
                 case FORWARD:
@@ -244,12 +240,11 @@ public class GameController  {
                     this.turnAround(player);
                     break;
                 default:
-                    // DO NOTHING (for now)
             }
         }
     }
 
-    /** card option */
+    //giving the cards options
     public void cardOption(Command option) {
         Player currentPlayer = board.getCurrentPlayer();
 
@@ -275,9 +270,9 @@ public class GameController  {
                 }
             }
         }
-    }/** card options end. */
+    }
 
-
+    //complicated move forward method :)
     public void moveForward(@NotNull Player player) {
         Space space = player.getSpace();
 
@@ -383,14 +378,11 @@ public class GameController  {
                 Scoring(player,endingspace,board);
                 System.out.println(player.getCheckpoints());
 
-//                while(checkCheckpoint(player.getSpace())) { //checks if there is a checkpoint
-//
-//                }
-
             }
         }
     }
 
+    //checking if the players are facing eachother, necessary method for bugs
     public boolean checkHeadingTowardsEachOther(@NotNull Player player, @NotNull Player targetPlayer){
 
         Heading player_heading = player.getHeading();
@@ -412,7 +404,7 @@ public class GameController  {
         return false;
     }
 
-    /** manually added conveyor belt  */
+    //the conveyor belt on the board
     public boolean checkConveyerbelt(@NotNull Space space){
         // 17-east,27-east,37-east,47-east,57-east,67-north
         Space space_cb17 = new Space(board,1,7);Space space_cb27 = new Space(board,2,7);
@@ -453,6 +445,7 @@ public class GameController  {
     private String toString(@NotNull Space space) {
         return  space.x+" "+space.y;
     }
+
     private boolean toStringCheck(@NotNull Space space1, @NotNull Space space2) {
         String space11 = toString(space1);
         String space22 = toString(space2);
@@ -498,26 +491,14 @@ public class GameController  {
                             if(toStringCheck(Gear_Space, player.getSpace())== false){
                                 targetplayer.setHeading(targetplayer_head1);
                             }
-                            //target.setPlayer(player);
-                            //space.setPlayer(targetplayer);
                         }
-//                        else { moveForward(targetplayer);
-//                        }
-                        //}
-                        //target.setPlayer(player);       // using forward method here caused problems so, its copied.
-
-//                    if(toStringCheck(Gear_Space, targetplayer.getSpace())){
-//                        turnLeft(targetplayer);
-                        // }
                     }
-                     //puts player heading back to were it was
                 }
                 moveForward(player);
                 player.setHeading(player_heading);
             }
         }
     }
-    /** manually added conveyor belt . end  */
 
     public void turnAround(@NotNull Player player){
         if (player != null && player.board == board) {
@@ -528,19 +509,16 @@ public class GameController  {
         }
     }
 
-
     public void fastForward(@NotNull Player player) {
         moveForward(player);
         moveForward(player);
     }
-
 
     public void turnRight(@NotNull Player player) {
         if (player != null && player.board == board) {
             player.setHeading(player.getHeading().next());
         }
     }
-
 
     public void turnLeft(@NotNull Player player) {
         if (player != null && player.board == board) {
@@ -560,13 +538,9 @@ public class GameController  {
         if(toStringCheck(space,space_56)){return 1;}
         return 0;
     }
-    // TODO Not working properly
+
     @SneakyThrows
-    public void Scoring(@NotNull Player player,
-                        @NotNull Space space, @NotNull Board board) {
-        //gameController = new GameController(board);
-        //roboRally = new RoboRally();
-        //AppController appController = new AppController(roboRally);
+    public void Scoring(@NotNull Player player,@NotNull Space space, @NotNull Board board) {
 
         player.setCheckpoints(player.getCheckpoints(),checkCheckpoint(space));
 
@@ -575,9 +549,7 @@ public class GameController  {
         player.getCheckpoints().contains(3)&&
         player.getCheckpoints().contains(4)
         ){
-            //roboRally.createBoardView(gameController);
             AppController appController = new AppController(this.roboRally);
-            //GameController gamecontroller = new GameController(board);
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("WINNER!");
@@ -589,42 +561,8 @@ public class GameController  {
 
             // This is not doing exactly as i want it to, the problem is that it sees roborally as NULL.
             appController.exit();
-
-
-//
-////            if (!result.isPresent() || result.get() != ButtonType.OK) {
-//                if(result.get() == ButtonType.OK){
-//
-//                    //gameController = this.gameController;
-//                roboRally.createBoardView(gamecontroller);
-//                } else {
-//                return;} // return without exiting the application
-//            }
         }
-
-//        if (checkCheckpoint(space)) {
-//            int value = space.checkpoint(player_space);
-//
-//            if (player.getProgress() == value - 1) {
-//                player.setProgress(value);
-//            }
-//
-//            //System.out.println(player.getProgress());
-//        }
-//        return player.getProgress();
-
-        //if (player.getProgress() == 4) {
-        //    Breaks execution of 'program' sequence
-        //    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        //    alert.setTitle("Game Over");
-        //    alert.setContentText(player.getName() + " Won!");
-        //    Optional<ButtonType> result = alert.showAndWait();
-
-        //    if (result.isPresent() || result.get() == ButtonType.OK) {
-        //        Platform.exit();
-        //    }
-        }
-
+    }
 
     void moveToSpace(@NotNull Player player, @NotNull Space space, @NotNull Heading heading) throws ImpossibleMoveException {
         assert board.getNeighbour(player.getSpace(), heading) == space; // make sure the move to here is possible in principle
@@ -647,8 +585,6 @@ public class GameController  {
         }
         player.setSpace(space);
     }
-
-
 
     public boolean moveCards(@NotNull CommandCardField source, @NotNull CommandCardField target) {
         CommandCard sourceCard = source.getCard();
@@ -675,5 +611,4 @@ public class GameController  {
             this.heading = heading;
         }
     }
-
 }
