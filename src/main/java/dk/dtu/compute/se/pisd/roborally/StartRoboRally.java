@@ -38,7 +38,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class StartRoboRally {
 
     public static void main(String[] args) {
-        SpringApplication.run(RestroborallyApplication.class, args);
+        try{
+            SpringApplication.run(RestroborallyApplication.class, args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         RoboRally.main(args);
     }
 

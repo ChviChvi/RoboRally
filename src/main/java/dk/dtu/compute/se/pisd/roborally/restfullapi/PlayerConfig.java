@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class PlayerConfig {
 
-    @Bean
-    CommandLineRunner commandLineRunner(
-            PlayerRepository repository) {
-        return args -> {
-        };
-    }
+//    @Bean
+//    CommandLineRunner commandLineRunner(
+//            PlayerRepository repository) {
+//        return args -> {
+//        };
+//    }
 }

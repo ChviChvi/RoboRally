@@ -6,7 +6,6 @@ import com.roborally.restroborally.model.Player;
 import com.roborally.restroborally.repository.PlayerRepository;
 
 import com.roborally.restroborally.service.PlayerService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

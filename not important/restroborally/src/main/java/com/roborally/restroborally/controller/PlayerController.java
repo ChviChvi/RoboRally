@@ -5,7 +5,6 @@ import com.roborally.restroborally.service.PlayerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.roborally.restroborally.service.PlayerService;
 
 import java.util.List;
 

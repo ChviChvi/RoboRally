@@ -1,5 +1,4 @@
 package com.roborally.restroborally.service;
-import com.roborally.restroborally.service.PlayerService;
 import com.roborally.restroborally.model.Player;
 
 import java.util.List;

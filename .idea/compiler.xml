@@ -14,6 +14,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="restful" target="1.5" />
+      <module name="restroborally" target="17" />
       <module name="wrapper" target="1.5" />
     </bytecodeTargetLevel>
   </component>

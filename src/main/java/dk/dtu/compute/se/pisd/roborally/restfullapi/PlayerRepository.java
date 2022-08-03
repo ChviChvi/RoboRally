@@ -11,12 +11,8 @@ import java.util.Optional;
 @Repository
 public interface PlayerRepository extends JpaRepository<Board, Long> {
 
-    // SELECT * FROM STUDENT WHERE email = ?
+    // SELECT * FROM player WHERE id = ?
     @Query("Select s FROM Board s WHERE s.id = ?1")
     Optional<Board> findPlayersById(Long id);
-
-    //List<Board> getallBoards();
-
-
 
 }

@@ -291,8 +291,6 @@ public class GameController  {
                     Player targetplayer = target.getPlayer();
                     Heading targetplayer_head = targetplayer.getHeading();
 
-
-
                     //if player looks towards a wall while targetplayer is up against it, turns head and put it back
                     targetplayer.setHeading(heading);
                     if(space.blockedWalls(targetplayer)) {
@@ -328,11 +326,9 @@ public class GameController  {
                     }
                     //moves targetplayer if they are not facing eachother or on a conveyorbelt
                     if((checkHeadingTowardsEachOther(player,targetplayer) || checkConveyerbelt(targetplayer.getSpace()) )== false){
-
                         targetplayer.setHeading(heading);
                         moveForward(targetplayer);
                         targetplayer.setHeading(targetplayer_head);
-
 
                         if(target.getPlayer() == null) {
                             target.setPlayer(player);
@@ -368,8 +364,6 @@ public class GameController  {
                 }
 
                 //fixes issue where a player tries to forward into a conveyor
-
-
                 if(checkConveyerbelt(target)){
                     return;
                 }
@@ -377,7 +371,6 @@ public class GameController  {
                 Space endingspace = player.getSpace();
                 Scoring(player,endingspace,board);
                 System.out.println(player.getCheckpoints());
-
             }
         }
     }

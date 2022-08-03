@@ -2,7 +2,6 @@ package com.roborally.restroborally.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import com.roborally.restroborally.service.PlayerService;
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 public class ResourceNotFoundException extends RuntimeException{
