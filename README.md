@@ -1,6 +1,6 @@
 ## RoboRally Game - Advanced Programming course
 
-This project revolves around the idea of programming a functional edition of Richards Garfield´s game “Robo Rally” from 1994. The game is played by 2-6 players, each choosing a robot to play on a selected course. 
+This project revolved around the idea of programming a functional edition of Richards Garfield´s game “Robo Rally” from 1994. The game is played by 2-6 players, each choosing a robot to play on a selected course. 
 
 Through using mySQL, RestAPI, Spring Bootframework and Java a playable game was created which can be played 'online' together.
 
